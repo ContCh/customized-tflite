@@ -6,5 +6,14 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(SCHEMA_DIRECTORY ${PROJECT_SOURCE_DIR}/schema)
 
+set(THIRD_PARTY_INCLUDE)
 # Third-party libraries compile
-add_subdirectory(third_party/flatbuffers)
+include(third_party/third_party.cmake)
+
+include_directories(include)
+include_directories(schema)
+
+add_subdirectory(source)
+add_subdirectory(test)
+#add_executable(main source/main.cpp)
+#target_link_libraries(main model_op_lib)
