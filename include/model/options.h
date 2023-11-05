@@ -1,5 +1,4 @@
-#ifndef CUSTOM_TFLITE_MODEL_OPTIONS_H
-#define CUSTOM_TFLITE_MODEL_OPTIONS_H
+#pragma once
 
 #include <vector>
 
@@ -7,6 +6,10 @@
 
 struct BaseOption {};
 
+/// Define necessary param type in option
+enum Padding { VALID = 0, SAME = 1 };
+
+/// Options based on op type
 struct Conv2DOption : public BaseOption {
     int     stride_w;
     int     stride_h;
@@ -15,7 +18,7 @@ struct Conv2DOption : public BaseOption {
     Padding pad_type;
 };
 
-struct Pool2DOption : public BaseOption  {
+struct Pool2DOption : public BaseOption {
     int     stride_w;
     int     stride_h;
     int     filter_w;
@@ -39,6 +42,3 @@ struct ReshapeOption : public BaseOption {
 struct SoftmaxOption : public BaseOption {
     float beta;
 };
-
-
-#endif // CUSTOM_TFLITE_MODEL_OPTIONS_H
