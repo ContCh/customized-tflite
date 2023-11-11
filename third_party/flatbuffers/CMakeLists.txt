@@ -11,7 +11,7 @@ ExternalProject_Add(flatbuffers
     INSTALL_COMMAND ""
 )
 
-add_custom_target(generated_ir ALL
+add_custom_target(generated_schema_ir ALL
     COMMAND           ${CMAKE_CURRENT_BINARY_DIR}/binary/flatc --cpp schema.fbs
     WORKING_DIRECTORY ${SCHEMA_DIRECTORY}
     DEPENDS           flatbuffers

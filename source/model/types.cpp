@@ -2,16 +2,14 @@
 
 #define ENUM_PRINT(EnumT, Val)                                                                     \
     case EnumT::Val:                                                                               \
-        os << #Val;                                                                                \
-        break;
+        return #Val;
 
 // TODO: breakdown process if default. Something strange happens.
 #define ENUM_DEFAULT_PRINT(Default)                                                                \
     default:                                                                                       \
-        os << #Default;                                                                            \
-        break;
+        return "NonType";
 
-std::ostream &operator<<(std::ostream &os, OperatorType op_type) {
+std::string ToStr(OperatorType op_type) {
     switch (op_type) {
         ENUM_PRINT(OperatorType, NONE);
         ENUM_PRINT(OperatorType, ADD);
@@ -92,10 +90,9 @@ std::ostream &operator<<(std::ostream &os, OperatorType op_type) {
 
         ENUM_DEFAULT_PRINT(NONE);
     }
-    return os;
 }
 
-std::ostream &operator<<(std::ostream &os, DataType data_type) {
+std::string ToStr(DataType data_type) {
     switch (data_type) {
         ENUM_PRINT(DataType, UNDEFINED);
         ENUM_PRINT(DataType, INT4);
@@ -115,7 +112,6 @@ std::ostream &operator<<(std::ostream &os, DataType data_type) {
 
         ENUM_DEFAULT_PRINT(NONE);
     }
-    return os;
 }
 
 #undef ENUM_PRINT

@@ -21,8 +21,8 @@ class Operator {
     void AddInput(BLOBID_T blob_id) { inputs_.push_back(blob_id); }
     void AddOutput(BLOBID_T blob_id) { outputs_.push_back(blob_id); }
 
-    const std::vector<BLOBID_T>& getInputs() { return inputs_; }
-    const std::vector<BLOBID_T>& getOutputs() { return outputs_; }
+    const std::vector<BLOBID_T>& GetInputs() const { return inputs_; }
+    const std::vector<BLOBID_T>& GetOutputs() const { return outputs_; }
 
     OperatorType GetOpType() const { return operator_type_; }
     OperatorType GetActivationType() const { return activation_type_; }

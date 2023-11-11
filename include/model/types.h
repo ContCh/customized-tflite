@@ -129,11 +129,11 @@ template <> struct DataTypeImpl<DataType::FLOAT64> { typedef double Type; };
 template <> struct DataTypeImpl<DataType::BOOL> { typedef bool Type; };
 
 
-#define ENUM_TYPE_PRINT_DECLARE(EnumT) \
-std::ostream& operator<<(std::ostream&, EnumT)
+#define ENUM_TYPE_TO_STR_DECLARE(EnumT) \
+std::string ToStr(EnumT)
 
-ENUM_TYPE_PRINT_DECLARE(OperatorType);
-ENUM_TYPE_PRINT_DECLARE(DataType);
+ENUM_TYPE_TO_STR_DECLARE(OperatorType);
+ENUM_TYPE_TO_STR_DECLARE(DataType);
 
 #undef ENUM_TYPE_PRINT_DECLARE
 

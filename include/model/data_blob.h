@@ -11,19 +11,19 @@
 class Shape {
  public:
     Shape() {}
-    Shape(std::initializer_list<int> dim_list) : dims_(dim_list) {}
+    Shape(const std::vector<int>& dim_list) : dims_(dim_list) {}
 
-    void setDims(std::initializer_list<int> dim_list) { dims_ = std::vector<int>(dim_list); }
+    void SetDims(const std::vector<int>& dim_list) { dims_ = dim_list; }
 
-    const std::vector<int>& getDims() const { return dims_; }
-    std::vector<int>&       mutableDims() { return dims_; }
+    const std::vector<int>& GetDims() const { return dims_; }
+    std::vector<int>&       MutableDims() { return dims_; }
 
-    int getDim(size_t i) const {
+    int GetDim(size_t i) const {
         // TODO: add check here avoid overflow
         return dims_[i];
     }
 
-    bool operator==(const Shape& comp) const { return getDims() == comp.getDims(); }
+    bool operator==(const Shape& comp) const { return GetDims() == comp.GetDims(); }
 
     bool operator!=(const Shape& comp) const { return !((*this) == comp); }
 
@@ -45,7 +45,8 @@ class DataBlob {
 
     DataBlob(std::string name) : name_(name) { blob_index_ = GenUniqueID(); }
 
-    BLOBID_T GetID() const { return blob_index_; }
+    BLOBID_T           GetID() const { return blob_index_; }
+    const std::string& GetName() const { return name_; }
 
     void         SetShape(const Shape& shape) { blob_shape_ = shape; }
     Shape&       GetShape() { return blob_shape_; }
@@ -60,16 +61,12 @@ class DataBlob {
     void                         AddConsumerID(NODEID_T node_id) { consumers_.push_back(node_id); }
     const std::vector<NODEID_T>& GetConsumerIDs() const { return consumers_; }
 
+    QuantParam&       GetQuantParam() { return *quantization_params_; }
+    const QuantParam& GetQuantParam() const { return *quantization_params_; }
+    bool              HasQuantParam() const { return quantization_params_ != nullptr; }
+    QuantParam&       CreateQuantParam();
+
     friend std::ostream& operator<<(std::ostream& os, const DataBlob& blob);
-
-    QuantParam& GetOrCreateQuantParam() {
-        if (!quantization_params_) {
-            quantization_params_ = std::make_unique<QuantParam>();
-        }
-        return *quantization_params_;
-    }
-
-    bool HasQuantParam() const { return quantization_params_ == nullptr; }
 
  private:
     BLOBID_T              blob_index_ = INVALID_ID;
