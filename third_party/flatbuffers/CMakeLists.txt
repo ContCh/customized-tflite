@@ -18,3 +18,4 @@ add_custom_target(generated_schema_ir ALL
 )
 
 set(FLATBUFFERS_INCLUDE ${CMAKE_CURRENT_BINARY_DIR}/source/include PARENT_SCOPE)
+

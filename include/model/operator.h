@@ -25,10 +25,6 @@ class Operator {
     const std::vector<BLOBID_T>& GetOutputs() const { return outputs_; }
 
     OperatorType GetOpType() const { return operator_type_; }
-    OperatorType GetActivationType() const { return activation_type_; }
-
-    void         SetActivation(OperatorType activation) { activation_type_ = activation; }
-    OperatorType GetActivation() const { return activation_type_; }
 
     template <typename T>
     T* GetOption() {
@@ -38,10 +34,15 @@ class Operator {
         return static_cast<T*>(option_.get());
     }
 
+    template <typename T>
+    const T* GetOption() const {
+        REPORT_ERROR_IF(option_ == nullptr, "No available option.");
+        return static_cast<const T*>(option_.get());
+    }
+
  private:
     NODEID_T     node_index_;
     OperatorType operator_type_   = OperatorType::NONE;
-    OperatorType activation_type_ = OperatorType::NONE;
 
     std::vector<BLOBID_T>       inputs_;
     std::vector<BLOBID_T>       outputs_;

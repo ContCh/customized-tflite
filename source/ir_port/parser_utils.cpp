@@ -59,15 +59,25 @@ DataType GetMappedDataTypeOf(tflite::TensorType tensor_type) {
     return DataType::UNDEFINED;
 }
 
-OperatorType GetMappedOpTypeOf(::tflite::BuiltinOperator op_code) {
-    static std::map<tflite::BuiltinOperator, OperatorType> operator_type_map = {
-        {tflite::BuiltinOperator_CONV_2D, OperatorType::CONV2D},
-        {tflite::BuiltinOperator_DEPTHWISE_CONV_2D, OperatorType::DEPTHWISE_CONV2D},
-        {tflite::BuiltinOperator_AVERAGE_POOL_2D, OperatorType::AVERAGE_POOL},
-        {tflite::BuiltinOperator_MAX_POOL_2D, OperatorType::MAX_POOL},
-        {tflite::BuiltinOperator_RESHAPE, OperatorType::RESHAPE},
-        {tflite::BuiltinOperator_SOFTMAX, OperatorType::SOFTMAX}};
-    return operator_type_map.at(op_code);
+
+OperatorType GetMappedActTypeOf(::tflite::ActivationFunctionType act_type) {
+    static std::map<tflite::ActivationFunctionType, OperatorType> act_type_map = {
+        {tflite::ActivationFunctionType_NONE, OperatorType::NONE},
+        {tflite::ActivationFunctionType_RELU, OperatorType::ReLU},
+        {tflite::ActivationFunctionType_RELU6, OperatorType::ReLU6},
+        {tflite::ActivationFunctionType_TANH, OperatorType::TANH}};
+    return act_type_map.at(act_type);
+}
+
+Padding GetMappedPaddingOf(::tflite::Padding padding) {
+    switch (padding) {
+        case ::tflite::Padding_SAME:
+            return Padding::SAME;
+        case ::tflite::Padding_VALID:
+            return Padding::VALID;
+        default:
+            return Padding::VALID;
+    }
 }
 
 } // namespace utils

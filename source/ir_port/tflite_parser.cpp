@@ -10,7 +10,7 @@ std::unique_ptr<Model> TfLiteParser::ImportModel(const std::string& tflite_file_
     const tflite::Model* input_model         = tflite::GetModel(input_file_contents.data());
 
     // Full list of all known operators.
-    std::unique_ptr<Model>   model = std::make_unique<Model>();
+    std::unique_ptr<Model> model = std::make_unique<Model>();
     // load tensors
     LoadTensors(*input_model, model.get());
     // operator table
@@ -81,7 +81,7 @@ void TfLiteParser::LoadOperatorsTable(const tflite::Model& input_model) {
         // TODO: Support to parse customized op
         REPORT_ERROR_IF(builtin_code == tflite::BuiltinOperator_CUSTOM,
                         "Customized op is not supported.");
-        op_type_table_.push_back(utils::GetMappedOpTypeOf(builtin_code));
+        op_type_table_.push_back(op_resolver_.GetMappedOpTypeOf(builtin_code));
     }
 }
 
@@ -93,9 +93,11 @@ void TfLiteParser::LoadOperators(const tflite::Model& input_model, Model* model)
 
     auto& main_graph = model->GetMainGraph();
     for (const auto* tflite_op : *tflite_ops) {
-        uint32_t index   = tflite_op->opcode_index();
-        auto     op_type = op_type_table_.at(index);
-        auto*    new_op  = main_graph.AddOperator(op_type);
+        uint32_t index       = tflite_op->opcode_index();
+        auto     op_type     = op_type_table_.at(index);
+        auto*    new_op      = main_graph.AddOperator(op_type);
+        auto*    op_resolver = op_resolver_.GetOptionResolver(op_type);
+        op_resolver->ParseOption(tflite_op->builtin_options(), *new_op);
 
         // TODO: Parse option for each type of operator
         auto inputs = utils::GetVecData(tflite_op->inputs());

@@ -5,6 +5,7 @@
 
 #include "schema_generated.h"
 #include "model/types.h"
+#include "model/options.h"
 
 namespace utils {
 std::string GetContents(const std::string& model_path);
@@ -20,6 +21,8 @@ std::vector<T> GetVecData(const ::flatbuffers::Vector<T>* flatbuffer_vec) {
 
 DataType GetMappedDataTypeOf(::tflite::TensorType tensor_type);
 
-OperatorType GetMappedOpTypeOf(::tflite::BuiltinOperator op_code);
+Padding GetMappedPaddingOf(::tflite::Padding padding);
+
+OperatorType GetMappedActTypeOf(::tflite::ActivationFunctionType op_code);
 
 } // namespace utils

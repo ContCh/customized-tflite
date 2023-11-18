@@ -20,12 +20,17 @@ inline auto for_each(_Tp&& container, _Func&& unary_func) {
 }
 
 template <typename _Tp>
-inline auto find(std::vector<_Tp>&& range, _Tp elem) {
+inline auto find(_Tp&& range, _Tp elem) {
     return std::find(std::begin(range), std::end(range), elem);
 }
 
+template <typename _Tp, typename _Func>
+inline auto find_if(_Tp&& range, _Func unary_func) {
+    return std::find_if(std::begin(range), std::end(range), std::forward<_Func>(unary_func));
+}
+
 template <typename _Tp>
-inline auto get_first_index(std::vector<_Tp>&& range, _Tp elem) {
+inline auto get_first_index(const std::vector<_Tp>& range, _Tp elem) {
     return std::distance(std::begin(range), std::find(std::begin(range), std::end(range), elem));
 }
 
