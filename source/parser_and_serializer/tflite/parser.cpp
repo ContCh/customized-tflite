@@ -2,8 +2,8 @@
 #include <string.h>
 
 #include "common/stl_wrapper.h"
-#include "ir_port/parser_utils.h"
-#include "ir_port/tflite_parser.h"
+#include "parser_and_serializer/tflite/parser.h"
+#include "parser_and_serializer/tflite/utils.h"
 
 std::unique_ptr<Model> TfLiteParser::ImportModel(const std::string& tflite_file_path) {
     auto                 input_file_contents = utils::GetContents(tflite_file_path);
@@ -17,6 +17,8 @@ std::unique_ptr<Model> TfLiteParser::ImportModel(const std::string& tflite_file_
     LoadOperatorsTable(*input_model);
     // load operators
     LoadOperators(*input_model, model.get());
+
+    LoadInputsOutputs(*input_model, model.get());
 
     return model;
 }
@@ -115,4 +117,23 @@ void TfLiteParser::LoadOperators(const tflite::Model& input_model, Model* model)
             data_blob->SetProducerID(new_op->GetID());
         });
     }
+}
+
+void TfLiteParser::LoadInputsOutputs(const tflite::Model& input_model, Model* model) {
+    auto inputs = (*input_model.subgraphs())[0]->inputs();
+    auto outputs = (*input_model.subgraphs())[0]->outputs();
+    auto graph_inputs_idx = utils::GetVecData<int>(inputs);
+    auto graph_outputs_idx = utils::GetVecData<int>(outputs);
+
+    std::vector<BLOBID_T> graph_inputs;
+    for (auto input_idx : graph_inputs_idx) {
+        graph_inputs.push_back(data_blob_table_.at(input_idx)->GetID());
+    }
+    std::vector<BLOBID_T> graph_outputs;
+    for (auto output_idx : graph_outputs_idx) {
+        graph_outputs.push_back(data_blob_table_.at(output_idx)->GetID());
+    }
+    auto& main_graph = model->GetMainGraph();
+    main_graph.SetGraphInputs(graph_inputs);
+    main_graph.SetGraphOutputs(graph_outputs);
 }

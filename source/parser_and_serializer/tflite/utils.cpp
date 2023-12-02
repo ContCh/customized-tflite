@@ -1,4 +1,4 @@
-#include "ir_port/parser_utils.h"
+#include "parser_and_serializer/tflite/utils.h"
 
 #include <fcntl.h>
 #include <map>
@@ -59,6 +59,32 @@ DataType GetMappedDataTypeOf(tflite::TensorType tensor_type) {
     return DataType::UNDEFINED;
 }
 
+tflite::TensorType  GetMappedDataTypeOf(DataType data_type) {
+    switch (data_type) {
+    case DataType::INT8:
+        return tflite::TensorType_INT8;
+    case DataType::UINT8:
+        return tflite::TensorType_UINT8;
+    case DataType::INT16:
+        return tflite::TensorType_INT16;
+    case DataType::UINT16:
+        return tflite::TensorType_UINT16;
+    case DataType::INT32:
+        return tflite::TensorType_INT32;
+    case DataType::UINT32:
+        return tflite::TensorType_UINT32;
+    case DataType::FLOAT16:
+        return tflite::TensorType_FLOAT16;
+    case DataType::FLOAT32:
+        return tflite::TensorType_FLOAT32;
+    case DataType::FLOAT64:
+        return tflite::TensorType_FLOAT64;
+    default:
+        report_error("Unsupported data type.");
+    }
+    return tflite::TensorType_FLOAT32;
+}
+
 
 OperatorType GetMappedActTypeOf(::tflite::ActivationFunctionType act_type) {
     static std::map<tflite::ActivationFunctionType, OperatorType> act_type_map = {
@@ -66,6 +92,15 @@ OperatorType GetMappedActTypeOf(::tflite::ActivationFunctionType act_type) {
         {tflite::ActivationFunctionType_RELU, OperatorType::ReLU},
         {tflite::ActivationFunctionType_RELU6, OperatorType::ReLU6},
         {tflite::ActivationFunctionType_TANH, OperatorType::TANH}};
+    return act_type_map.at(act_type);
+}
+
+::tflite::ActivationFunctionType GetMappedActTypeOf(OperatorType act_type) {
+    static std::map<OperatorType, tflite::ActivationFunctionType> act_type_map = {
+        {OperatorType::NONE, tflite::ActivationFunctionType_NONE},
+        {OperatorType::ReLU, tflite::ActivationFunctionType_RELU},
+        {OperatorType::ReLU6, tflite::ActivationFunctionType_RELU6},
+        {OperatorType::TANH, tflite::ActivationFunctionType_TANH}};
     return act_type_map.at(act_type);
 }
 
@@ -77,6 +112,17 @@ Padding GetMappedPaddingOf(::tflite::Padding padding) {
             return Padding::VALID;
         default:
             return Padding::VALID;
+    }
+}
+
+::tflite::Padding GetMappedPaddingOf(Padding padding) {
+    switch (padding) {
+    case Padding::SAME:
+        return ::tflite::Padding::Padding_SAME;
+    case Padding::VALID:
+        return ::tflite::Padding::Padding_VALID;
+    default:
+        return ::tflite::Padding::Padding_VALID;
     }
 }
 

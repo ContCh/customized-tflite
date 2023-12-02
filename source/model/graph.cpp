@@ -1,13 +1,23 @@
 #include "model/graph.h"
 
+#include "common/stl_wrapper.h"
 
 std::vector<Operator*> Graph::GetOperators() const {
     std::vector<Operator*> ops_list;
-    std::transform(operators_.begin(), operators_.end(), std::back_inserter(ops_list),
-                   [](const std::pair<const NODEID_T, std::unique_ptr<Operator>>& id_to_op) {
-                       return id_to_op.second.get();
-                   });
+    common::transform(operators_, std::back_inserter(ops_list),
+                      [](const std::pair<const NODEID_T, std::unique_ptr<Operator>>& id_to_op) {
+                          return id_to_op.second.get();
+                      });
     return ops_list;
+}
+
+std::vector<DataBlob*> Graph::GetDataBlobs() const {
+    std::vector<DataBlob*> data_blobs_list;
+    common::transform(data_blobs_, std::back_inserter(data_blobs_list),
+                      [](const std::pair<const BLOBID_T, std::unique_ptr<DataBlob>>& id_to_blob) {
+                          return id_to_blob.second.get();
+                      });
+    return data_blobs_list;
 }
 
 Operator* Graph::GetOperator(NODEID_T node_id) const {

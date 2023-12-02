@@ -6,7 +6,7 @@
 #include <map>
 
 /**
- * GraphvizSerializer collect model's information and visualize the information
+ * GraphvizSerializer collect model's information and visualize the information.
  * It describes the model structure by graphviz format, and user can type the command
  * "dot -Tsvg `output_path` -O" to generate the visualized model structure.
  * About graphviz, please refer to https://www.graphviz.org/ for more details.

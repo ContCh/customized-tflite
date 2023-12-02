@@ -1,4 +1,4 @@
-#include "ir_port/graphviz_serializer.h"
+#include "parser_and_serializer/graphviz/serializer.h"
 
 #include "model/types.h"
 #include <fstream>

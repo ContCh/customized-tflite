@@ -17,6 +17,7 @@ class Graph {
 
  public:
     std::vector<Operator*> GetOperators() const;
+    std::vector<DataBlob*> GetDataBlobs() const;
 
     Operator*                   GetOperator(NODEID_T node_id) const;
     DataBlob*                   GetDataBlob(BLOBID_T blob_id) const;
@@ -30,13 +31,22 @@ class Graph {
     void SetBuffer(BLOBID_T blob_id, const std::vector<T>& buffer) {
         size_t bytes      = sizeof(T) * buffer.size();
         buffers_[blob_id] = std::vector<uint8_t>(bytes);
-        memcpy((void*)buffer.data(), (void*)buffers_.at(blob_id).data(), bytes);
+        memcpy(buffers_.at(blob_id).data(), buffer.data(), bytes);
     }
 
     void EraseOperator(Operator* op) { operators_.erase(op->GetID()); }
+
+    const std::vector<BLOBID_T>& GetGraphInputs() const { return graph_inputs_; }
+    const std::vector<BLOBID_T>& GetGraphOutputs() const { return graph_outputs_; }
+
+    void SetGraphInputs(const std::vector<BLOBID_T>& inputs) { graph_inputs_ = inputs; }
+    void SetGraphOutputs(const std::vector<BLOBID_T>& outputs) { graph_outputs_ = outputs; }
 
  private:
     DataBlobMap data_blobs_;
     OperatorMap operators_;
     BufferMap   buffers_;
+
+    std::vector<BLOBID_T> graph_inputs_;
+    std::vector<BLOBID_T> graph_outputs_;
 };
