@@ -1,7 +1,8 @@
 #include "parser_and_serializer/graphviz/serializer.h"
 
-#include "model/types.h"
 #include <fstream>
+
+#include "model/types.h"
 
 void GraphvizSerializer::ExportToGraphviz(const Model& model, std::string output_path) {
     std::ofstream output_file(output_path.c_str(), std::ios::out);
@@ -23,8 +24,8 @@ void GraphvizSerializer::ExportOperators(const Graph& subgraph, std::ostream& ou
         op_viz_name_map_[op->GetID()] = op_viz_name;
         output_stream << "  " << op_viz_name;
         output_stream << R"([label=<<TABLE BORDER="1" CELLBORDER="0" BGCOLOR="cyan4">)";
-        output_stream << R"(<TR><TD ALIGN="CENTER"><FONT POINT-SIZE="16">[ID:)" << op->GetID()
-                      << "] " << op_type_str << R"(</FONT></TD></TR>)";
+        output_stream << R"(<TR><TD ALIGN="CENTER"><FONT POINT-SIZE="16">[ID:)" << op->GetID() << "] " << op_type_str
+                      << R"(</FONT></TD></TR>)";
         // TODO: export option for each type of operator
         output_stream << R"(</TABLE>>])";
         output_stream << '\n';
@@ -54,17 +55,16 @@ std::string GraphvizSerializer::ExportBlob(const DataBlob* data_blob, std::ostre
     std::string blob_viz_name = "BLOB_" + std::to_string(data_blob->GetID());
     output_stream << "  " << blob_viz_name;
     output_stream << R"([label=<<TABLE BORDER="1" CELLBORDER="0" BGCOLOR="tan1">)";
-    output_stream << R"(<TR><TD ALIGN="CENTER"><FONT POINT-SIZE="16">[BLOB_ID:)"
-                  << data_blob->GetID() << R"(] </FONT></TD></TR>)";
-    output_stream << R"(<TR><TD ALIGN="CENTER"><FONT POINT-SIZE="14">DATA_TYPE: )"
-                  << ToStr(data_blob->GetDataType()) << R"(</FONT></TD></TR>)";
+    output_stream << R"(<TR><TD ALIGN="CENTER"><FONT POINT-SIZE="16">[BLOB_ID:)" << data_blob->GetID()
+                  << R"(] </FONT></TD></TR>)";
+    output_stream << R"(<TR><TD ALIGN="CENTER"><FONT POINT-SIZE="14">DATA_TYPE: )" << ToStr(data_blob->GetDataType())
+                  << R"(</FONT></TD></TR>)";
     output_stream << R"(<TR><TD ALIGN="CENTER"><FONT POINT-SIZE="14">)" << data_blob->GetShape()
                   << R"(</FONT></TD></TR>)";
     if (data_blob->HasQuantParam()) {
         auto quant_param = data_blob->GetQuantParam();
-        output_stream << R"(<TR><TD ALIGN="CENTER"><FONT POINT-SIZE="14"> SCALE: )"
-                      << quant_param.scales[0] << "  ZERO_POINT: " << quant_param.zero_points[0]
-                      << R"(</FONT></TD></TR>)";
+        output_stream << R"(<TR><TD ALIGN="CENTER"><FONT POINT-SIZE="14"> SCALE: )" << quant_param.scales[0]
+                      << "  ZERO_POINT: " << quant_param.zero_points[0] << R"(</FONT></TD></TR>)";
     }
     output_stream << R"(</TABLE>>])";
     output_stream << '\n';

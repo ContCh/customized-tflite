@@ -41,8 +41,7 @@ inline auto get_first_index(const std::vector<_Tp>& range, _Tp elem) {
 
 template <typename _Tp, typename _Up, typename _Func>
 inline auto transform(_Tp&& container, _Up output_it, _Func unary_func) {
-    std::transform(std::begin(container), std::end(container), output_it,
-                   std::forward<_Func>(unary_func));
+    std::transform(std::begin(container), std::end(container), output_it, std::forward<_Func>(unary_func));
 }
 
 template <typename... _Tp>
@@ -64,4 +63,4 @@ bool contains(_Tp&& container, _Up&& elem) {
     }
 }
 
-} // namespace common
+}  // namespace common

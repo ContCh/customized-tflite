@@ -1,12 +1,12 @@
 #include "model/types.h"
 
-#define ENUM_PRINT(EnumT, Val)                                                                     \
-    case EnumT::Val:                                                                               \
+#define ENUM_PRINT(EnumT, Val) \
+    case EnumT::Val:           \
         return #Val;
 
 // TODO: breakdown process if default. Something strange happens.
-#define ENUM_DEFAULT_PRINT(Default)                                                                \
-    default:                                                                                       \
+#define ENUM_DEFAULT_PRINT(Default) \
+    default:                        \
         return "NonType";
 
 std::string ToStr(OperatorType op_type) {

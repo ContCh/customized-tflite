@@ -1,27 +1,22 @@
 #pragma once
 
+#include <string.h>
+#include <sys/time.h>
+
 #include <ctime>
 #include <exception>
 #include <iostream>
 #include <mutex>
 #include <sstream>
-#include <string.h>
-#include <sys/time.h>
 
 #include "common/singleton.h"
 
-enum {
-    LOG_LEVEL_INFO  = 0,
-    LOG_LEVEL_WARN  = 1,
-    LOG_LEVEL_ERROR = 2,
-    LOG_LEVEL_TEMP  = 3,
-    LOG_LEVEL_FATAL = 4
-};
+enum { LOG_LEVEL_INFO = 0, LOG_LEVEL_WARN = 1, LOG_LEVEL_ERROR = 2, LOG_LEVEL_TEMP = 3, LOG_LEVEL_FATAL = 4 };
 class LogMessage;
 class LogSettings;
 class DummyLogDecorator;
 
-#define SET_MINIMUM_LOG_LEVEL(log_level)                                                           \
+#define SET_MINIMUM_LOG_LEVEL(log_level) \
     LogSettings::GetInstance()->SetMinimumLogLevel(static_cast<uint32_t>(log_level))
 #define SET_OUTPUT_LOG_FILE(output_file) LogSettings::GetInstance()->SetTargetLogFile(output_file)
 
@@ -29,8 +24,7 @@ class DummyLogDecorator;
 
 #define LogMessageHeader(level) LogMessage(LOG_LEVEL_##level, __FILENAME__, __LINE__)
 
-#define LOG_IF(level, condition)                                                                   \
-    !(condition) ? (void)0 : DummyLogDecorator() & LogMessageHeader(level).stream()
+#define LOG_IF(level, condition) !(condition) ? (void)0 : DummyLogDecorator() & LogMessageHeader(level).stream()
 
 #define LOG(level) LOG_IF(level, true)
 
@@ -50,11 +44,11 @@ void print_error_information(Args... args) {
     throw std::runtime_error("Terminate due to error.");
 }
 
-#define REPORT_ERROR_IF(condition, ...)                                                            \
-    do {                                                                                           \
-        if ((condition)) {                                                                         \
-            report_error(__VA_ARGS__);                                                             \
-        }                                                                                          \
+#define REPORT_ERROR_IF(condition, ...) \
+    do {                                \
+        if ((condition)) {              \
+            report_error(__VA_ARGS__);  \
+        }                               \
     } while (0)
 
 /*************************************************************************************
@@ -93,7 +87,7 @@ class LogStreamBuffer : public std::streambuf {
 
 constexpr int MaxBufferLen = 1024;
 
-class LogStream : public std::ostream { //: public std::ostream {
+class LogStream : public std::ostream {  //: public std::ostream {
  public:
     LogStream();
     void Flush();

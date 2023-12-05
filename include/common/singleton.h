@@ -20,12 +20,12 @@ class Singleton {
     virtual ~Singleton() {};
 
  protected:
-    Singleton()                 = default;
-    Singleton(const Singleton&) = default;
+    Singleton()                            = default;
+    Singleton(const Singleton&)            = default;
     Singleton& operator=(const Singleton&) = default;
 
     static std::unique_ptr<T> instance_;
-    static std::mutex mtx_;
+    static std::mutex         mtx_;
 };
 
 template <typename T>

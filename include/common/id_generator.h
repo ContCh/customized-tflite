@@ -1,7 +1,8 @@
 #pragma once
 
-#include "common/singleton.h"
 #include <atomic>
+
+#include "common/singleton.h"
 
 #define GenUniqueID() IDGenerator::GetInstance()->GenID()
 
@@ -12,6 +13,7 @@ class IDGenerator : public Singleton<IDGenerator> {
     GEN_ID_TYPE GenID() { return global_id_++; }
 
     friend class Singleton<IDGenerator>;
+
  private:
     IDGenerator()                       = default;
     std::atomic<GEN_ID_TYPE> global_id_ = 0;

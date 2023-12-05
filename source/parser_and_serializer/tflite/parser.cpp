@@ -1,8 +1,10 @@
-#include <map>
+#include "parser_and_serializer/tflite/parser.h"
+
 #include <string.h>
 
+#include <map>
+
 #include "common/stl_wrapper.h"
-#include "parser_and_serializer/tflite/parser.h"
 #include "parser_and_serializer/tflite/utils.h"
 
 std::unique_ptr<Model> TfLiteParser::ImportModel(const std::string& tflite_file_path) {
@@ -39,8 +41,7 @@ void TfLiteParser::LoadTensors(const tflite::Model& input_model, Model* model) {
         int   buffer_index = tensor->buffer();
         auto* src_buffer   = buffers->Get(buffer_index)->data();
         if (src_buffer != nullptr) {
-            std::vector<uint8_t> src_data(src_buffer->data(),
-                                          src_buffer->data() + src_buffer->size());
+            std::vector<uint8_t> src_data(src_buffer->data(), src_buffer->data() + src_buffer->size());
             main_graph.SetBuffer(data_blob->GetID(), src_data);
         }
         // Get blob shape
@@ -78,11 +79,9 @@ void TfLiteParser::LoadOperatorsTable(const tflite::Model& input_model) {
     }
     for (const auto* opcode : *opcodes) {
         auto builtin_code =
-            std::max(opcode->builtin_code(),
-                     static_cast<tflite::BuiltinOperator>(opcode->deprecated_builtin_code()));
+            std::max(opcode->builtin_code(), static_cast<tflite::BuiltinOperator>(opcode->deprecated_builtin_code()));
         // TODO: Support to parse customized op
-        REPORT_ERROR_IF(builtin_code == tflite::BuiltinOperator_CUSTOM,
-                        "Customized op is not supported.");
+        REPORT_ERROR_IF(builtin_code == tflite::BuiltinOperator_CUSTOM, "Customized op is not supported.");
         op_type_table_.push_back(op_resolver_.GetMappedOpTypeOf(builtin_code));
     }
 }
@@ -120,9 +119,9 @@ void TfLiteParser::LoadOperators(const tflite::Model& input_model, Model* model)
 }
 
 void TfLiteParser::LoadInputsOutputs(const tflite::Model& input_model, Model* model) {
-    auto inputs = (*input_model.subgraphs())[0]->inputs();
-    auto outputs = (*input_model.subgraphs())[0]->outputs();
-    auto graph_inputs_idx = utils::GetVecData<int>(inputs);
+    auto inputs            = (*input_model.subgraphs())[0]->inputs();
+    auto outputs           = (*input_model.subgraphs())[0]->outputs();
+    auto graph_inputs_idx  = utils::GetVecData<int>(inputs);
     auto graph_outputs_idx = utils::GetVecData<int>(outputs);
 
     std::vector<BLOBID_T> graph_inputs;

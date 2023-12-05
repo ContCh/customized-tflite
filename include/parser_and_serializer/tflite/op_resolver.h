@@ -14,8 +14,8 @@ class BaseOptionResolver {
  public:
     virtual ~BaseOptionResolver() = default;
 
-    virtual flatbuffers::Offset<void>
-    SerializeOption(const Operator& op, ::flatbuffers::FlatBufferBuilder* builder) const = 0;
+    virtual flatbuffers::Offset<void> SerializeOption(const Operator&                   op,
+                                                      ::flatbuffers::FlatBufferBuilder* builder) const = 0;
 
     virtual void ParseOption(const void* builtin_options, Operator& op) const = 0;
 };
@@ -26,8 +26,7 @@ class TfLiteOptionResolver : public BaseOptionResolver {
     using TfLiteOptionT = Tp;
     using BaseOptionT   = Up;
 
-    flatbuffers::Offset<void> SerializeOption(const Operator&                   op,
-                                              ::flatbuffers::FlatBufferBuilder* builder) const {
+    flatbuffers::Offset<void> SerializeOption(const Operator& op, ::flatbuffers::FlatBufferBuilder* builder) const {
         auto* option        = op.GetOption<BaseOptionT>();
         auto  tflite_option = SerializeOptionImpl(*option, builder);
         return tflite_option.Union();
@@ -40,9 +39,9 @@ class TfLiteOptionResolver : public BaseOptionResolver {
     }
 
  protected:
-    virtual void ParseOptionImpl(BaseOptionT&, const TfLiteOptionT&) const = 0;
-    virtual flatbuffers::Offset<TfLiteOptionT>
-    SerializeOptionImpl(const BaseOptionT&, ::flatbuffers::FlatBufferBuilder*) const = 0;
+    virtual void                               ParseOptionImpl(BaseOptionT&, const TfLiteOptionT&) const    = 0;
+    virtual flatbuffers::Offset<TfLiteOptionT> SerializeOptionImpl(const BaseOptionT&,
+                                                                   ::flatbuffers::FlatBufferBuilder*) const = 0;
 };
 
 class OperatorResolver {
@@ -50,28 +49,26 @@ class OperatorResolver {
     OperatorResolver();
 
     template <typename T, typename = std::enable_if_t<std::is_base_of_v<BaseOptionResolver, T>>>
-    void AddOpResolver(OperatorType op_type, ::tflite::BuiltinOperator tflite_type,
-                       ::tflite::BuiltinOptions builtin_option) {
+    void AddOpResolver(OperatorType              op_type,
+                       ::tflite::BuiltinOperator tflite_type,
+                       ::tflite::BuiltinOptions  builtin_option) {
         option_resolver_map_[op_type] = std::make_unique<T>();
         op_type_hints_table_.push_back({op_type, tflite_type, builtin_option});
     }
 
     OperatorType GetMappedOpTypeOf(::tflite::BuiltinOperator op_code) const {
-        auto target = common::find_if(op_type_hints_table_, [&](const auto& type_hint) {
-            return type_hint.tflite_type == op_code;
-        });
+        auto target = common::find_if(op_type_hints_table_,
+                                      [&](const auto& type_hint) { return type_hint.tflite_type == op_code; });
         return target->op_type;
     }
     ::tflite::BuiltinOperator GetMappedOpTypeOf(OperatorType op_type) const {
-        auto target = common::find_if(op_type_hints_table_, [&](const auto& type_hint) {
-            return type_hint.op_type == op_type;
-        });
+        auto target =
+            common::find_if(op_type_hints_table_, [&](const auto& type_hint) { return type_hint.op_type == op_type; });
         return target->tflite_type;
     }
     ::tflite::BuiltinOptions GetMappedOptionTypeOf(OperatorType op_type) const {
-        auto target = common::find_if(op_type_hints_table_, [&](const auto& type_hint) {
-            return type_hint.op_type == op_type;
-        });
+        auto target =
+            common::find_if(op_type_hints_table_, [&](const auto& type_hint) { return type_hint.op_type == op_type; });
         return target->option_type;
     }
 

@@ -28,4 +28,4 @@ Padding           GetMappedPaddingOf(::tflite::Padding padding);
 OperatorType                     GetMappedActTypeOf(::tflite::ActivationFunctionType op_code);
 ::tflite::ActivationFunctionType GetMappedActTypeOf(OperatorType op_code);
 
-} // namespace utils
+}  // namespace utils

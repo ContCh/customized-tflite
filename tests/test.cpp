@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include "common/logging.h"
 #include "common/id_generator.h"
+#include "common/logging.h"
 
 int main() {
     LOG(INFO) << GenUniqueID();

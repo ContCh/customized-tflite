@@ -7,6 +7,7 @@
 typedef uint32_t NODEID_T;
 typedef uint32_t BLOBID_T;
 typedef uint32_t BUFID_T;
+
 static const uint32_t INVALID_ID = UINT32_MAX;
 
 enum class OperatorType {
@@ -114,28 +115,51 @@ enum class DataType {
 
 template <DataType T> struct DataTypeImpl {};
 
-template <> struct DataTypeImpl<DataType::UNDEFINED> { typedef void Type; };
-template <> struct DataTypeImpl<DataType::UINT8> { typedef uint8_t Type; };
-template <> struct DataTypeImpl<DataType::INT8> { typedef int8_t Type; };
-template <> struct DataTypeImpl<DataType::UINT16> { typedef uint16_t Type; };
-template <> struct DataTypeImpl<DataType::INT16> { typedef int16_t Type; };
-template <> struct DataTypeImpl<DataType::UINT32> { typedef uint32_t Type; };
-template <> struct DataTypeImpl<DataType::INT32> { typedef int32_t Type; };
-template <> struct DataTypeImpl<DataType::UINT64> { typedef uint64_t Type; };
-template <> struct DataTypeImpl<DataType::INT64> { typedef int64_t Type; };
-template <> struct DataTypeImpl<DataType::FLOAT16> { typedef uint16_t Type; };
-template <> struct DataTypeImpl<DataType::FLOAT32> { typedef float Type; };
-template <> struct DataTypeImpl<DataType::FLOAT64> { typedef double Type; };
-template <> struct DataTypeImpl<DataType::BOOL> { typedef bool Type; };
+template <> struct DataTypeImpl<DataType::UNDEFINED> {
+    typedef void Type;
+};
+template <> struct DataTypeImpl<DataType::UINT8> {
+    typedef uint8_t Type;
+};
+template <> struct DataTypeImpl<DataType::INT8> {
+    typedef int8_t Type;
+};
+template <> struct DataTypeImpl<DataType::UINT16> {
+    typedef uint16_t Type;
+};
+template <> struct DataTypeImpl<DataType::INT16> {
+    typedef int16_t Type;
+};
+template <> struct DataTypeImpl<DataType::UINT32> {
+    typedef uint32_t Type;
+};
+template <> struct DataTypeImpl<DataType::INT32> {
+    typedef int32_t Type;
+};
+template <> struct DataTypeImpl<DataType::UINT64> {
+    typedef uint64_t Type;
+};
+template <> struct DataTypeImpl<DataType::INT64> {
+    typedef int64_t Type;
+};
+template <> struct DataTypeImpl<DataType::FLOAT16> {
+    typedef uint16_t Type;
+};
+template <> struct DataTypeImpl<DataType::FLOAT32> {
+    typedef float Type;
+};
+template <> struct DataTypeImpl<DataType::FLOAT64> {
+    typedef double Type;
+};
+template <> struct DataTypeImpl<DataType::BOOL> {
+    typedef bool Type;
+};
 
-
-#define ENUM_TYPE_TO_STR_DECLARE(EnumT) \
-std::string ToStr(EnumT)
+#define ENUM_TYPE_TO_STR_DECLARE(EnumT) std::string ToStr(EnumT)
 
 ENUM_TYPE_TO_STR_DECLARE(OperatorType);
 ENUM_TYPE_TO_STR_DECLARE(DataType);
 
 #undef ENUM_TYPE_PRINT_DECLARE
 
-
-#endif // CUSTOM_TFLITE_TYPES_H
+#endif  // CUSTOM_TFLITE_TYPES_H

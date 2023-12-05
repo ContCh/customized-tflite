@@ -1,9 +1,9 @@
 #pragma once
 
-#include "model/model.h"
-
 #include <fstream>
 #include <map>
+
+#include "model/model.h"
 
 /**
  * GraphvizSerializer collect model's information and visualize the information.

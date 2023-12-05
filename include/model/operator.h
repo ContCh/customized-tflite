@@ -10,10 +10,7 @@
 
 class Operator {
  public:
-    Operator(OperatorType op_type)
-        : operator_type_(op_type) {
-        node_index_ = GenUniqueID();
-    }
+    Operator(OperatorType op_type) : operator_type_(op_type) { node_index_ = GenUniqueID(); }
     ~Operator() {}
 
     NODEID_T GetID() const { return node_index_; }
@@ -42,11 +39,11 @@ class Operator {
 
  private:
     NODEID_T     node_index_;
-    OperatorType operator_type_   = OperatorType::NONE;
+    OperatorType operator_type_ = OperatorType::NONE;
 
     std::vector<BLOBID_T>       inputs_;
     std::vector<BLOBID_T>       outputs_;
     std::unique_ptr<BaseOption> option_;
 };
 
-#endif // CUSTOM_TFLITE_OPERATOR_H
+#endif  // CUSTOM_TFLITE_OPERATOR_H
