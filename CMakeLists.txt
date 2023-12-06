@@ -14,6 +14,4 @@ include_directories(include)
 include_directories(schema)
 
 add_subdirectory(source)
-add_subdirectory(test)
-#add_executable(main source/main.cpp)
-#target_link_libraries(main model_op_lib)
+add_subdirectory(tests)
