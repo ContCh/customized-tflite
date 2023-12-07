@@ -28,7 +28,7 @@ class DummyLogDecorator;
 
 #define LOG(level) LOG_IF(level, true)
 
-#ifdef NDEBUG
+#ifndef NDEBUG
 #define DLOG(level) LOG_IF(level, true)
 #else
 #define DLOG(level) LOG_IF(level, false)
@@ -87,7 +87,7 @@ class LogStreamBuffer : public std::streambuf {
 
 constexpr int MaxBufferLen = 1024;
 
-class LogStream : public std::ostream {  //: public std::ostream {
+class LogStream : public std::ostream {
  public:
     LogStream();
     void Flush();
