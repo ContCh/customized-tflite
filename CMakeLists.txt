@@ -1,8 +1,16 @@
 project(CUSTOM_TFLITE)
 
 cmake_minimum_required(VERSION 3.15)
-add_compile_options(-Wall -Werror -O0)
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+
+string(TOUPPER "${CMAKE_BUILD_TYPE}" BUILD_TYPE)
+if (BUILD_TYPE STREQUAL "DEBUG")
+    add_compile_options(-O0 -g)
+else()
+    add_compile_options(-O3 -DNDEBUG)
+endif()
+add_compile_options(-Wall -Werror)
 
 set(SCHEMA_DIRECTORY ${PROJECT_SOURCE_DIR}/schema)
 
