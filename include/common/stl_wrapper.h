@@ -59,7 +59,7 @@ bool contains(_Tp&& container, _Up&& elem) {
     if constexpr (has_find_method<_Tp, _Up>::value) {
         return container.find(elem) != container.end();
     } else {
-        return common::find(std::forward<_Tp>(container), elem) != std::end(container);
+        return std::find(std::begin(container), std::end(container), elem) != std::end(container);
     }
 }
 
