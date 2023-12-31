@@ -35,6 +35,9 @@ class Graph {
     }
 
     void EraseOperator(Operator* op) { operators_.erase(op->GetID()); }
+    void EraseOperator(std::function<bool(const Operator*)>);
+    void EraseBlob(DataBlob* blob) { data_blobs_.erase(blob->GetID()); }
+    void EraseBlob(std::function<bool(const DataBlob*)>);
 
     const std::vector<BLOBID_T>& GetGraphInputs() const { return graph_inputs_; }
     const std::vector<BLOBID_T>& GetGraphOutputs() const { return graph_outputs_; }

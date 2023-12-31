@@ -57,3 +57,23 @@ DataBlob* Graph::AddDataBlob(std::string name) {
     data_blobs_[new_data_blob->GetID()] = std::unique_ptr<DataBlob>(new_data_blob);
     return new_data_blob;
 }
+
+void Graph::EraseOperator(std::function<bool(const Operator*)> erase_cond) {
+    for (auto op_it = operators_.begin(); op_it != operators_.end();) {
+        if (erase_cond(op_it->second.get())) {
+          op_it = operators_.erase(op_it);
+            continue;
+        }
+        op_it++;
+    }
+}
+
+void Graph::EraseBlob(std::function<bool(const DataBlob*)> erase_cond) {
+    for (auto blob_it = data_blobs_.begin(); blob_it != data_blobs_.end();) {
+        if (erase_cond(blob_it->second.get())) {
+            blob_it = data_blobs_.erase(blob_it);
+            continue;
+        }
+        blob_it++;
+    }
+}

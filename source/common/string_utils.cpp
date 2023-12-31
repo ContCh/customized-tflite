@@ -1,5 +1,7 @@
 #include "common/string_utils.h"
 
+#include <algorithm>
+
 namespace common {
 
 std::string join(const std::vector <std::string> &strs, char connector) {
