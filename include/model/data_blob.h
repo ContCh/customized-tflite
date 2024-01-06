@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "common/id_generator.h"
+#include "common/iterator_adaptor.h"
 #include "model/types.h"
 
 class Shape {
@@ -34,6 +35,9 @@ class Shape {
     std::vector<int> dims_;
 };
 
+class Graph;
+class Operator;
+
 class DataBlob {
  public:
     struct QuantParam {
@@ -43,7 +47,20 @@ class DataBlob {
         std::vector<int64_t> zero_points;
     };
 
-    DataBlob(std::string name) : name_(name) { blob_index_ = GenUniqueID(); }
+    class OperatorIterator
+        : public IteratorAdaptor<OperatorIterator, std::vector<BLOBID_T>::const_iterator, Operator*> {
+     public:
+        OperatorIterator(const Graph& graph, const std::vector<BLOBID_T>::const_iterator& iter)
+            : IteratorAdaptor(iter), graph_(graph) {}
+
+        Operator* dereference();
+
+     private:
+        const Graph& graph_;
+    };
+
+ public:
+    DataBlob(std::string name, const Graph& graph) : graph_(graph), name_(name) { blob_index_ = GenUniqueID(); }
 
     BLOBID_T           GetID() const { return blob_index_; }
     const std::string& GetName() const { return name_; }
@@ -55,11 +72,10 @@ class DataBlob {
     void     SetDataType(DataType data_type) { data_type_ = data_type; }
     DataType GetDataType() const { return data_type_; }
 
-    void     SetProducerID(NODEID_T node_id) { producer_ = node_id; }
-    NODEID_T GetProducerID() const { return producer_; }
-
-    void                         AddConsumerID(NODEID_T node_id) { consumers_.push_back(node_id); }
-    const std::vector<NODEID_T>& GetConsumerIDs() const { return consumers_; }
+    void                    SetProducer(const Operator* op);
+    Operator*               GetProducer() const;
+    void                    AddConsumer(const Operator* op);
+    Range<OperatorIterator> GetConsumers() const;
 
     QuantParam&       GetQuantParam() { return *quantization_params_; }
     const QuantParam& GetQuantParam() const { return *quantization_params_; }
@@ -69,6 +85,7 @@ class DataBlob {
     friend std::ostream& operator<<(std::ostream& os, const DataBlob& blob);
 
  private:
+    const Graph&          graph_;
     BLOBID_T              blob_index_ = INVALID_ID;
     DataType              data_type_  = DataType::UNDEFINED;
     NODEID_T              producer_   = INVALID_ID;

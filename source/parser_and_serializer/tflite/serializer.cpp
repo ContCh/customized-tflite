@@ -109,10 +109,12 @@ std::vector<Offset<tflite::Buffer>> TfLiteSerializer::ExportBuffers(const Model&
 
 Offset<Vector<Offset<tflite::Tensor>>> TfLiteSerializer::ExportTensors(const Graph&                    subgraph,
                                                                        flatbuffers::FlatBufferBuilder* builder) {
-    auto data_blobs = subgraph.GetDataBlobs();
+    data_blob_index_map_.clear();
+    std::vector<DataBlob*> data_blobs(subgraph.GetDataBlobs().size());
+    common::transform(subgraph.GetDataBlobs(), data_blobs.begin(), [](DataBlob* blob) { return blob; });
     std::sort(data_blobs.begin(), data_blobs.end(),
               [](const DataBlob* blob1, const DataBlob* blob2) { return blob1->GetName() < blob2->GetName(); });
-    data_blob_index_map_.clear();
+
     for (uint32_t index = 0; index < data_blobs.size(); index++) {
         data_blob_index_map_[data_blobs.at(index)->GetID()] = index;
     }
@@ -127,8 +129,8 @@ Offset<Vector<Offset<tflite::Tensor>>> TfLiteSerializer::ExportTensors(const Gra
             Offset<Vector<float>>   max;
             Offset<Vector<float>>   scale;
             Offset<Vector<int64_t>> zero_point;
-            min         = builder->CreateVector(std::vector<float>{quantization.min});
-            max         = builder->CreateVector(std::vector<float>{quantization.max});
+            min         = builder->CreateVector(std::vector<float> {quantization.min});
+            max         = builder->CreateVector(std::vector<float> {quantization.max});
             scale       = builder->CreateVector(quantization.scales);
             zero_point  = builder->CreateVector(quantization.zero_points);
             quant_param = tflite::CreateQuantizationParameters(*builder, min, max, scale, zero_point);
@@ -156,11 +158,11 @@ Offset<Vector<Offset<tflite::Operator>>> TfLiteSerializer::ExportOperators(const
         REPORT_ERROR_IF(op_index >= op_type_table_.size(), "Op type is not registered when export");
 
         std::vector<int32_t> inputs;
-        common::transform(op->GetInputs(), std::back_inserter(inputs),
-                          [&](int32_t in_blob_id) { return data_blob_index_map_.at(in_blob_id); });
+        common::transform(op->GetInputBlobs(), std::back_inserter(inputs),
+                          [&](const DataBlob* blob) { return data_blob_index_map_.at(blob->GetID()); });
         std::vector<int32_t> outputs;
-        common::transform(op->GetOutputs(), std::back_inserter(outputs),
-                          [&](int32_t out_blob_id) { return data_blob_index_map_.at(out_blob_id); });
+        common::transform(op->GetOutputBlobs(), std::back_inserter(outputs),
+                          [&](const DataBlob* blob) { return data_blob_index_map_.at(blob->GetID()); });
         auto  option_type = op_resolver_.GetMappedOptionTypeOf(op->GetOpType());
         auto* op_resolver = op_resolver_.GetOptionResolver(op->GetOpType());
         auto  op_option   = op_resolver->SerializeOption(*op, builder);

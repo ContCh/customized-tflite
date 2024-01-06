@@ -5,39 +5,57 @@
 #include <vector>
 
 #include "common/id_generator.h"
+#include "common/iterator_adaptor.h"
+#include "common/logging.h"
 #include "model/options.h"
 #include "model/types.h"
 
+class Graph;
+class DataBlob;
+
 class Operator {
  public:
-    Operator(OperatorType op_type) : operator_type_(op_type) { node_index_ = GenUniqueID(); }
+    class DataBlobIterator
+        : public IteratorAdaptor<DataBlobIterator, std::vector<BLOBID_T>::const_iterator, DataBlob*> {
+     public:
+        DataBlobIterator(const Graph& graph, const std::vector<BLOBID_T>::const_iterator& iter)
+            : IteratorAdaptor(iter), graph_(graph) {}
+
+        DataBlob* dereference();
+
+     private:
+        const Graph& graph_;
+    };
+
+ public:
+    Operator(OperatorType op_type, const Graph& graph) : graph_(graph), operator_type_(op_type) {
+        node_index_ = GenUniqueID();
+    }
     ~Operator() {}
 
-    NODEID_T GetID() const { return node_index_; }
-
-    void AddInput(BLOBID_T blob_id) { inputs_.push_back(blob_id); }
-    void AddOutput(BLOBID_T blob_id) { outputs_.push_back(blob_id); }
-
-    const std::vector<BLOBID_T>& GetInputs() const { return inputs_; }
-    const std::vector<BLOBID_T>& GetOutputs() const { return outputs_; }
-
+    NODEID_T     GetID() const { return node_index_; }
     OperatorType GetOpType() const { return operator_type_; }
 
-    template <typename T>
-    T* GetOption() {
+    void AddInputBlob(const DataBlob* blob);
+    void AddOutputBlob(const DataBlob* blob);
+
+    Range<DataBlobIterator> GetInputBlobs() const;
+    Range<DataBlobIterator> GetOutputBlobs() const;
+
+    template <typename T> T* GetOption() {
         if (option_ == nullptr) {
             option_ = std::make_unique<T>();
         }
         return static_cast<T*>(option_.get());
     }
 
-    template <typename T>
-    const T* GetOption() const {
+    template <typename T> const T* GetOption() const {
         REPORT_ERROR_IF(option_ == nullptr, "No available option.");
         return static_cast<const T*>(option_.get());
     }
 
  private:
+    const Graph& graph_;
     NODEID_T     node_index_;
     OperatorType operator_type_ = OperatorType::NONE;
 

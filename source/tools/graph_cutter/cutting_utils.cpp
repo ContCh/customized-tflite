@@ -35,6 +35,7 @@ void CuttingUtils::CutGraphImpl(Model&                          model,
     }
     auto forward_op_set  = CollectOpsForward(main_graph, sub_inputs);
     auto backward_op_set = CollectOpsBackward(main_graph, sub_outputs);
+
     std::set<const Operator*> ops_to_keep;
     for (const auto* op : forward_op_set) {
         if (common::contains(backward_op_set, op)) {
@@ -52,26 +53,25 @@ std::set<const Operator*> CuttingUtils::CollectOpsForward(const Graph& graph, co
     std::set<const Operator*>   ops_traverse;
     for (auto blob_id : blob_ids) {
         auto* blob = graph.GetDataBlob(blob_id);
-        for (auto op_id : blob->GetConsumerIDs()) {
-            if (ops_traverse.count(graph.GetOperator(op_id))) {
+        for (auto* op : blob->GetConsumers()) {
+            if (common::contains(ops_traverse, op)) {
                 continue;
             }
-            ops_traverse.insert(graph.GetOperator(op_id));
-            ops_queue.push(graph.GetOperator(op_id));
+            ops_traverse.insert(op);
+            ops_queue.push(op);
         }
     }
 
     while (!ops_queue.empty()) {
         const auto* op = ops_queue.front();
         ops_queue.pop();
-        for (auto blob_id : op->GetOutputs()) {
-            auto* blob = graph.GetDataBlob(blob_id);
-            for (auto op_id : blob->GetConsumerIDs()) {
-                if (ops_traverse.count(graph.GetOperator(op_id))) {
+        for (auto* blob : op->GetOutputBlobs()) {
+            for (auto* op_successor : blob->GetConsumers()) {
+                if (common::contains(ops_traverse, op_successor)) {
                     continue;
                 }
-                ops_traverse.insert(graph.GetOperator(op_id));
-                ops_queue.push(graph.GetOperator(op_id));
+                ops_traverse.insert(op_successor);
+                ops_queue.push(op_successor);
             }
         }
     }
@@ -82,25 +82,24 @@ std::set<const Operator*> CuttingUtils::CollectOpsBackward(const Graph& graph, c
     std::queue<const Operator*> ops_queue;
     std::set<const Operator*>   ops_traverse;
     for (auto blob_id : blob_ids) {
-        auto* blob  = graph.GetDataBlob(blob_id);
-        auto  op_id = blob->GetProducerID();
-        if (op_id == INVALID_ID) {
+        auto* blob = graph.GetDataBlob(blob_id);
+        auto* op   = blob->GetProducer();
+        if (op == nullptr) {
             continue;
         }
-        ops_traverse.insert(graph.GetOperator(op_id));
-        ops_queue.push(graph.GetOperator(op_id));
+        ops_traverse.insert(op);
+        ops_queue.push(op);
     }
     while (!ops_queue.empty()) {
         const auto* op = ops_queue.front();
         ops_queue.pop();
-        for (auto blob_id : op->GetInputs()) {
-            auto* blob  = graph.GetDataBlob(blob_id);
-            auto  op_id = blob->GetProducerID();
-            if (op_id == INVALID_ID) {
+        for (auto* blob : op->GetInputBlobs()) {
+            auto* op_predecessor = blob->GetProducer();
+            if (op_predecessor == nullptr) {
                 continue;
             }
-            ops_traverse.insert(graph.GetOperator(op_id));
-            ops_queue.push(graph.GetOperator(op_id));
+            ops_traverse.insert(op_predecessor);
+            ops_queue.push(op_predecessor);
         }
     }
     return ops_traverse;
@@ -109,11 +108,11 @@ std::set<const Operator*> CuttingUtils::CollectOpsBackward(const Graph& graph, c
 void CuttingUtils::RemoveUnnecessaryOpsAndBlobs(Graph& graph, const std::set<const Operator*>& ops_to_keep) {
     std::set<const DataBlob*> blobs_to_keep;
     for (const auto* op : ops_to_keep) {
-        for (auto blob_id : op->GetInputs()) {
-            blobs_to_keep.insert(graph.GetDataBlob(blob_id));
+        for (const auto* input_blob : op->GetInputBlobs()) {
+            blobs_to_keep.insert(input_blob);
         }
-        for (auto blob_id : op->GetOutputs()) {
-            blobs_to_keep.insert(graph.GetDataBlob(blob_id));
+        for (const auto* output_blob : op->GetOutputBlobs()) {
+            blobs_to_keep.insert(output_blob);
         }
     }
     // Remove

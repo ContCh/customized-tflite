@@ -35,16 +35,14 @@ void GraphvizSerializer::ExportOperators(const Graph& subgraph, std::ostream& ou
 void GraphvizSerializer::ExportBlobsAndEdges(const Graph& subgraph, std::ostream& output_stream) {
     for (const auto& [op_id, op_viz_name] : op_viz_name_map_) {
         const auto* op = subgraph.GetOperator(op_id);
-        for (auto input_blob_id : op->GetInputs()) {
-            if (subgraph.GetBuffer(input_blob_id) != nullptr) {
+        for (auto* data_blob : op->GetInputBlobs()) {
+            if (subgraph.GetBuffer(data_blob->GetID()) != nullptr) {
                 continue;
             }
-            auto* data_blob     = subgraph.GetDataBlob(input_blob_id);
             auto  blob_viz_name = ExportBlob(data_blob, output_stream);
             output_stream << "  " << blob_viz_name << "->" << op_viz_name << '\n';
         }
-        for (auto output_blob_id : op->GetOutputs()) {
-            auto* data_blob     = subgraph.GetDataBlob(output_blob_id);
+        for (auto* data_blob : op->GetOutputBlobs()) {
             auto  blob_viz_name = ExportBlob(data_blob, output_stream);
             output_stream << "  " << op_viz_name << "->" << blob_viz_name << '\n';
         }

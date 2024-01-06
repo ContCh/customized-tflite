@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "common/iterator_adaptor.h"
 #include "common/logging.h"
 #include "model/data_blob.h"
 #include "model/operator.h"
@@ -16,8 +17,23 @@ class Graph {
     using OperatorMap = std::unordered_map<NODEID_T, std::unique_ptr<Operator>>;
 
  public:
-    std::vector<Operator*> GetOperators() const;
-    std::vector<DataBlob*> GetDataBlobs() const;
+    class OperatorIterator : public IteratorAdaptor<OperatorIterator, OperatorMap::const_iterator, Operator*> {
+     public:
+        OperatorIterator(const OperatorMap::const_iterator& iter) : IteratorAdaptor(iter) {}
+
+        Operator* dereference() { return base()->second.get(); }
+    };
+
+    class DataBlobIterator : public IteratorAdaptor<DataBlobIterator, DataBlobMap::const_iterator, DataBlob*> {
+     public:
+        DataBlobIterator(const DataBlobMap::const_iterator& iter) : IteratorAdaptor(iter) {}
+
+        DataBlob* dereference() { return base()->second.get(); }
+    };
+
+ public:
+    Range<OperatorIterator> GetOperators() const;
+    Range<DataBlobIterator> GetDataBlobs() const;
 
     Operator*                   GetOperator(NODEID_T node_id) const;
     DataBlob*                   GetDataBlob(BLOBID_T blob_id) const;
@@ -27,8 +43,7 @@ class Graph {
     Operator* AddOperator(OperatorType op_type);
     DataBlob* AddDataBlob(std::string name);
 
-    template <typename T>
-    void SetBuffer(BLOBID_T blob_id, const std::vector<T>& buffer) {
+    template <typename T> void SetBuffer(BLOBID_T blob_id, const std::vector<T>& buffer) {
         size_t bytes      = sizeof(T) * buffer.size();
         buffers_[blob_id] = std::vector<uint8_t>(bytes);
         memcpy(buffers_.at(blob_id).data(), buffer.data(), bytes);
