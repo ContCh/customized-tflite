@@ -104,16 +104,17 @@ void TfLiteParser::LoadOperators(const tflite::Model& input_model, Model* model)
         auto inputs = utils::GetVecData(tflite_op->inputs());
         common::for_each(inputs, [&](int32_t input_idx) {
             auto* data_blob = data_blob_table_.at(input_idx);
-            new_op->AddInput(data_blob->GetID());
-            data_blob->AddConsumerID(new_op->GetID());
+            new_op->AddInputBlob(data_blob);
+            data_blob->AddConsumer(new_op);
         });
+
         auto outputs = utils::GetVecData(tflite_op->outputs());
         common::for_each(outputs, [&](int32_t output_idx) {
             auto* data_blob = data_blob_table_.at(output_idx);
-            new_op->AddOutput(data_blob->GetID());
-            REPORT_ERROR_IF(data_blob->GetProducerID() != INVALID_ID, data_blob->GetName(),
+            REPORT_ERROR_IF(data_blob->GetProducer() != nullptr, data_blob->GetName(),
                             " is the output of more than 2 ops, which is abnormal situation.");
-            data_blob->SetProducerID(new_op->GetID());
+            new_op->AddOutputBlob(data_blob);
+            data_blob->SetProducer(new_op);
         });
     }
 }
