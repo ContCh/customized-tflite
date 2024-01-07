@@ -20,8 +20,7 @@ class BaseOptionResolver {
     virtual void ParseOption(const void* builtin_options, Operator& op) const = 0;
 };
 
-template <typename Tp, typename Up>
-class TfLiteOptionResolver : public BaseOptionResolver {
+template <typename Tp, typename Up> class TfLiteOptionResolver : public BaseOptionResolver {
  public:
     using TfLiteOptionT = Tp;
     using BaseOptionT   = Up;

@@ -8,6 +8,7 @@
 #include "parser_and_serializer/tflite/utils.h"
 
 std::unique_ptr<Model> TfLiteParser::ImportModel(const std::string& tflite_file_path) {
+    LOG(INFO) << "TfLiteParser::ImportModel Start.";
     auto                 input_file_contents = utils::GetContents(tflite_file_path);
     const tflite::Model* input_model         = tflite::GetModel(input_file_contents.data());
 
@@ -21,11 +22,12 @@ std::unique_ptr<Model> TfLiteParser::ImportModel(const std::string& tflite_file_
     LoadOperators(*input_model, model.get());
 
     LoadInputsOutputs(*input_model, model.get());
-
+    LOG(INFO) << "TfLiteParser::ImportModel End.";
     return model;
 }
 
 void TfLiteParser::LoadTensors(const tflite::Model& input_model, Model* model) {
+    DLOG(INFO) << "TfLiteParser::LoadTensors Start.";
     auto tensors = (*input_model.subgraphs())[0]->tensors();
     if (!tensors) {
         return;
@@ -51,7 +53,7 @@ void TfLiteParser::LoadTensors(const tflite::Model& input_model, Model* model) {
             data_blob->SetShape(Shape(dimensions));
         } else {
             // Set shape=1 by default
-            auto dummy_shape = Shape(std::vector<int>{1});
+            auto dummy_shape = Shape(std::vector<int> {1});
             data_blob->SetShape(dummy_shape);
         }
         // Get quant param
@@ -73,6 +75,7 @@ void TfLiteParser::LoadTensors(const tflite::Model& input_model, Model* model) {
 }
 
 void TfLiteParser::LoadOperatorsTable(const tflite::Model& input_model) {
+    DLOG(INFO) << "TfLiteParser::LoadOperatorsTable Start.";
     auto opcodes = input_model.operator_codes();
     if (opcodes == nullptr) {
         return;
@@ -87,6 +90,7 @@ void TfLiteParser::LoadOperatorsTable(const tflite::Model& input_model) {
 }
 
 void TfLiteParser::LoadOperators(const tflite::Model& input_model, Model* model) {
+    DLOG(INFO) << "TfLiteParser::LoadOperators Start.";
     auto tflite_ops = (*input_model.subgraphs())[0]->operators();
     if (tflite_ops == nullptr) {
         return;
@@ -120,6 +124,7 @@ void TfLiteParser::LoadOperators(const tflite::Model& input_model, Model* model)
 }
 
 void TfLiteParser::LoadInputsOutputs(const tflite::Model& input_model, Model* model) {
+    DLOG(INFO) << "TfLiteParser::LoadInputsOutputs Start.";
     auto inputs            = (*input_model.subgraphs())[0]->inputs();
     auto outputs           = (*input_model.subgraphs())[0]->outputs();
     auto graph_inputs_idx  = utils::GetVecData<int>(inputs);

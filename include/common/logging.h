@@ -36,8 +36,7 @@ class DummyLogDecorator;
 
 #define report_error(...) print_error_information(__VA_ARGS__);
 
-template <typename... Args>
-void print_error_information(Args... args) {
+template <typename... Args> void print_error_information(Args... args) {
     std::ostringstream oss;
     ((oss << args), ...);
     printf("\033[0;31m[ERROR]\033[0m %s\n", oss.str().c_str());
