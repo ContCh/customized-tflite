@@ -11,8 +11,9 @@ struct ArgCs {
 int main(int argc, char** argv) {
     ArgCs             command_args;
     std::vector<Flag> flags = {
-        Flag("--text", command_args.text, REQUIRED::NO, "It is a test text, you can type what you want [Required] "
-                                                         "it is a loooooooooooooooooooooong str, which tests xxx"),
+        Flag("--text", command_args.text, REQUIRED::NO,
+             "It is a test text, you can type what you want [Required] "
+             "it is a loooooooooooooooooooooong str, which tests xxx"),
         Flag("--input", "-i", command_args.val, REQUIRED::YES, "It is an input."),
         Flag("--trigger", "-t", command_args.trigger, REQUIRED::NO, "It is Nothing"),
     };

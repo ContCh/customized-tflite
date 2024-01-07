@@ -3,8 +3,7 @@
 #include <memory>
 #include <mutex>
 
-template <typename T>
-class Singleton {
+template <typename T> class Singleton {
  public:
     static T* GetInstance() {
         if (instance_ == nullptr) {
@@ -28,8 +27,6 @@ class Singleton {
     static std::mutex         mtx_;
 };
 
-template <typename T>
-std::unique_ptr<T> Singleton<T>::instance_ = nullptr;
+template <typename T> std::unique_ptr<T> Singleton<T>::instance_ = nullptr;
 
-template <typename T>
-std::mutex Singleton<T>::mtx_;
+template <typename T> std::mutex Singleton<T>::mtx_;

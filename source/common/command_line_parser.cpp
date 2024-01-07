@@ -88,9 +88,9 @@ void CommandLineParser::PrintUsage(const std::string& binary_name, const std::ve
         std::cerr << usage_str.substr(0, usage_print_len) << '\n';
         usage_str = usage_str.substr(usage_print_len, usage_str.size() - usage_print_len);
         while (!usage_str.empty()) {
-          usage_print_len = std::min(usage_str.size(), USAGE_MAX_COLS);
-          std::cerr << std::setw(usage_align_loc) << ' ' << usage_str.substr(0, usage_print_len) << '\n';
-          usage_str = usage_str.substr(usage_print_len, usage_str.size() - usage_print_len);
+            usage_print_len = std::min(usage_str.size(), USAGE_MAX_COLS);
+            std::cerr << std::setw(usage_align_loc) << ' ' << usage_str.substr(0, usage_print_len) << '\n';
+            usage_str = usage_str.substr(usage_print_len, usage_str.size() - usage_print_len);
         }
     }
     std::cerr << '\n' << std::setw(usage_align_loc) << "--help " << "Print help message for each option.\n";

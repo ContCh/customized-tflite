@@ -1,4 +1,5 @@
 #include <string.h>
+
 #include <string>
 #include <vector>
 
@@ -14,4 +15,4 @@ std::string tolower(const std::string& str);
 
 std::string strip(const std::string& str);
 
-} // namespace common
+}  // namespace common
