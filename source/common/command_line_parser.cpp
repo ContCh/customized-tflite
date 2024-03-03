@@ -3,6 +3,7 @@
 #include <ctype.h>
 
 #include <algorithm>
+#include <filesystem>
 #include <iomanip>
 #include <iostream>
 #include <string>
@@ -66,31 +67,60 @@ void CommandLineParser::Parse(int argc, char** argv, const std::vector<Flag>& fl
 }
 
 void CommandLineParser::PrintUsage(const std::string& binary_name, const std::vector<Flag>& flag_list) {
-    std::cerr << "Usage [" << binary_name << "]\n\n";
-    const size_t      USAGE_MAX_COLS       = 59;
-    const std::string SEGMENT              = "  ";
+    std::filesystem::path binary_path(binary_name);
+    std::cerr << "Usage [" << binary_path.filename().string() << "]:\n\n";
+    const size_t      usage_max_cols       = 60;
+    const size_t      left_trace_limit     = 8;
+    const std::string item_segment         = "  ";
     size_t            flag_name_max_length = 0;
     size_t            type_name_max_length = 0;
     common::for_each(flag_list, [&](const Flag& flag) {
-        auto print_name      = flag.first_name_ + ", " + flag.alias_;
+        auto print_name      = flag.first_name_ + (flag.alias_.empty() ? item_segment : (", " + flag.alias_));
         flag_name_max_length = std::max(flag_name_max_length, print_name.size());
         type_name_max_length = std::max(type_name_max_length, flag.type_.size());
     });
 
-    auto usage_align_loc = (flag_name_max_length + type_name_max_length + 2 * SEGMENT.size());
+    auto usage_align_loc = (flag_name_max_length + type_name_max_length + 2 * item_segment.size());
     for (const auto& flag : flag_list) {
-        auto print_name = flag.first_name_ + ", " + flag.alias_;
-        std::cerr << std::left << std::setw(flag_name_max_length) << print_name << SEGMENT;
-        std::cerr << std::left << std::setw(type_name_max_length) << flag.type_ << SEGMENT;
+        auto print_name = flag.first_name_ + (flag.alias_.empty() ? item_segment : (", " + flag.alias_));
+        std::cerr << std::left << std::setw(flag_name_max_length) << print_name << item_segment;
+        std::cerr << std::left << std::setw(type_name_max_length) << flag.type_ << item_segment;
 
-        auto   usage_str       = flag.usage_text_;
-        size_t usage_print_len = std::min(usage_str.size(), USAGE_MAX_COLS);
-        std::cerr << usage_str.substr(0, usage_print_len) << '\n';
-        usage_str = usage_str.substr(usage_print_len, usage_str.size() - usage_print_len);
-        while (!usage_str.empty()) {
-            usage_print_len = std::min(usage_str.size(), USAGE_MAX_COLS);
-            std::cerr << std::setw(usage_align_loc) << ' ' << usage_str.substr(0, usage_print_len) << '\n';
-            usage_str = usage_str.substr(usage_print_len, usage_str.size() - usage_print_len);
+        std::string_view usage_str(flag.usage_text_);
+        bool             first_usage_line = true;
+        int32_t          index            = 0;
+        while (index < static_cast<int32_t>(usage_str.size())) {
+            int32_t end_index     = std::min(usage_str.size() - 1, index + usage_max_cols - 1);
+            int32_t newline_index = end_index;
+            while (newline_index >= index && usage_str[newline_index] != '\n') {
+                newline_index--;
+            }
+            if (newline_index >= index) {
+                end_index = newline_index;
+            }
+
+            // 1. \n means mandatory newline
+            // 2. If the signature in next location is space, then print util next location
+            // 3. If not the cases above, trace back util meet a space, it is helpful for printing a complete word
+            if (usage_str[end_index] != '\n' && end_index + 1 < static_cast<int32_t>(usage_str.size()) &&
+                isspace(usage_str[end_index + 1])) {
+                end_index = end_index + 1;
+            } else if (end_index + 1 != static_cast<int32_t>(usage_str.size())) {
+                size_t traceback = 0;
+                while (traceback < left_trace_limit && !isspace(usage_str[end_index - traceback])) {
+                    traceback++;
+                }
+                end_index = traceback >= left_trace_limit ? end_index : end_index - traceback;
+            }
+            auto substr_to_print = usage_str.substr(index, end_index - index + 1);
+            if (first_usage_line) {
+                std::cerr << substr_to_print << (usage_str[end_index] != '\n' ? '\n' : '\0');
+                first_usage_line = false;
+            } else {
+                std::cerr << std::setw(usage_align_loc) << ' ' << substr_to_print
+                          << (usage_str[end_index] != '\n' ? '\n' : '\0');
+            }
+            index = end_index + 1;
         }
     }
     std::cerr << '\n' << std::setw(usage_align_loc) << "--help " << "Print help message for each option.\n";
