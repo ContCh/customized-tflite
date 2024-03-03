@@ -1,10 +1,14 @@
 #include "common/string_utils.h"
 
 #include <algorithm>
+#include <unordered_set>
 
 namespace common {
-
 std::string join(const std::vector<std::string>& strs, char connector) {
+    return join(strs, std::string(1, connector));
+}
+
+std::string join(const std::vector<std::string>& strs, std::string_view connector) {
     std::string output;
     for (auto str_it = strs.begin(); str_it != strs.end(); str_it++) {
         if (str_it != strs.begin()) {
@@ -16,6 +20,10 @@ std::string join(const std::vector<std::string>& strs, char connector) {
 }
 
 std::vector<std::string> split(std::string str, char delimiter) {
+    return split(str, std::string(1, delimiter));
+}
+
+std::vector<std::string> split(std::string str, std::string_view delimiter) {
     std::vector<std::string> output;
     size_t                   location = str.find_first_of(delimiter);
     while (location != std::string::npos) {
@@ -41,9 +49,27 @@ std::string tolower(const std::string& str) {
     return lower_str;
 }
 
+std::string lstrip(const std::string& str) {
+    const static std::unordered_set<char> blanks = {' ', '\r', '\n', '\t', '\v', '\f'};
+    int32_t index = 0;
+    int32_t str_size = str.size();
+    while (index < str_size && blanks.find(str.at(index)) != blanks.end()) {
+        ++index;
+    }
+    return index == str_size ? std::string{} : str.substr(index, str.size() - index);
+}
+
+std::string rstrip(const std::string& str) {
+    const static std::unordered_set<char> blanks = {' ', '\r', '\n', '\t', '\v', '\f'};
+    int32_t index = str.size() - 1;
+    while (index >= 0 && blanks.find(str.at(index)) != blanks.end()) {
+        --index;
+    }
+    return index < 0 ? std::string{} : str.substr(0, index + 1);
+}
+
 std::string strip(const std::string& str) {
-    // TODO: implement similar to python
-    return std::string {};
+    return lstrip(rstrip(str));
 }
 
 }  // namespace common
