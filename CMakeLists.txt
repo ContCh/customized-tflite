@@ -4,6 +4,8 @@ cmake_minimum_required(VERSION 3.15)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+option(ENABLE_UNIT_TEST "Enable unit test verifying base functions" OFF)
+
 string(TOUPPER "${CMAKE_BUILD_TYPE}" BUILD_TYPE)
 if (BUILD_TYPE STREQUAL "DEBUG")
     add_compile_options(-O0 -g)
