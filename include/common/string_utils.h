@@ -5,7 +5,6 @@
 
 namespace common {
 
-
 std::string join(const std::vector<std::string>& strs, char connector = ' ');
 std::string join(const std::vector<std::string>& strs, std::string_view connector);
 
