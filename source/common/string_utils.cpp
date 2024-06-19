@@ -4,9 +4,7 @@
 #include <unordered_set>
 
 namespace common {
-std::string join(const std::vector<std::string>& strs, char connector) {
-    return join(strs, std::string(1, connector));
-}
+std::string join(const std::vector<std::string>& strs, char connector) { return join(strs, std::string(1, connector)); }
 
 std::string join(const std::vector<std::string>& strs, std::string_view connector) {
     std::string output;
@@ -19,9 +17,7 @@ std::string join(const std::vector<std::string>& strs, std::string_view connecto
     return output;
 }
 
-std::vector<std::string> split(std::string str, char delimiter) {
-    return split(str, std::string(1, delimiter));
-}
+std::vector<std::string> split(std::string str, char delimiter) { return split(str, std::string(1, delimiter)); }
 
 std::vector<std::string> split(std::string str, std::string_view delimiter) {
     std::vector<std::string> output;
@@ -50,26 +46,24 @@ std::string tolower(const std::string& str) {
 }
 
 std::string lstrip(const std::string& str) {
-    const static std::unordered_set<char> blanks = {' ', '\r', '\n', '\t', '\v', '\f'};
-    int32_t index = 0;
-    int32_t str_size = str.size();
+    static const std::unordered_set<char> blanks   = {' ', '\r', '\n', '\t', '\v', '\f'};
+    int32_t                               index    = 0;
+    int32_t                               str_size = str.size();
     while (index < str_size && blanks.find(str.at(index)) != blanks.end()) {
         ++index;
     }
-    return index == str_size ? std::string{} : str.substr(index, str.size() - index);
+    return index == str_size ? std::string {} : str.substr(index, str.size() - index);
 }
 
 std::string rstrip(const std::string& str) {
-    const static std::unordered_set<char> blanks = {' ', '\r', '\n', '\t', '\v', '\f'};
-    int32_t index = str.size() - 1;
+    static const std::unordered_set<char> blanks = {' ', '\r', '\n', '\t', '\v', '\f'};
+    int32_t                               index  = str.size() - 1;
     while (index >= 0 && blanks.find(str.at(index)) != blanks.end()) {
         --index;
     }
-    return index < 0 ? std::string{} : str.substr(0, index + 1);
+    return index < 0 ? std::string {} : str.substr(0, index + 1);
 }
 
-std::string strip(const std::string& str) {
-    return lstrip(rstrip(str));
-}
+std::string strip(const std::string& str) { return lstrip(rstrip(str)); }
 
 }  // namespace common

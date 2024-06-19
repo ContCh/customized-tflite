@@ -1,8 +1,8 @@
 #include <iostream>
 
 #include "common/logging.h"
-#include "googletest/include/gtest/gtest.h"
 #include "googlemock/include/gmock/gmock.h"
+#include "googletest/include/gtest/gtest.h"
 
 int main(int argc, char** argv) {
     LOG(INFO) << "Start Unit Test!";
