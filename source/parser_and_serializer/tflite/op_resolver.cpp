@@ -79,6 +79,28 @@ class TransposeConv2DOptionResolver
     }
 };
 
+class Conv3DOptionResolver : public TfLiteOptionResolver<::tflite::Conv3DOptions, Conv3DOption> {
+    void ParseOptionImpl(Conv3DOption& option, const ::tflite::Conv3DOptions& tflite_option) const final {
+        option.stride_d          = tflite_option.stride_d();
+        option.stride_w          = tflite_option.stride_w();
+        option.stride_h          = tflite_option.stride_h();
+        option.dilation_d_factor = tflite_option.dilation_d_factor();
+        option.dilation_w_factor = tflite_option.dilation_w_factor();
+        option.dilation_h_factor = tflite_option.dilation_h_factor();
+        option.pad_type          = utils::GetMappedPaddingOf(tflite_option.padding());
+        option.activation_type   = utils::GetMappedActTypeOf(tflite_option.fused_activation_function());
+    }
+
+    flatbuffers::Offset<::tflite::Conv3DOptions>
+    SerializeOptionImpl(const Conv3DOption& option, ::flatbuffers::FlatBufferBuilder* builder) const final {
+        auto tflite_padding  = utils::GetMappedPaddingOf(option.pad_type);
+        auto fuse_activation = utils::GetMappedActTypeOf(option.activation_type);
+        return tflite::CreateConv3DOptions(*builder, tflite_padding, option.stride_d, option.stride_w, option.stride_h,
+                                           fuse_activation, option.dilation_d_factor, option.dilation_w_factor,
+                                           option.dilation_h_factor);
+    }
+};
+
 class ReshapeOptionResolver : public TfLiteOptionResolver<::tflite::ReshapeOptions, ReshapeOption> {
     void ParseOptionImpl(ReshapeOption& option, const ::tflite::ReshapeOptions& tflite_option) const final {
         option.new_shape = utils::GetVecData<int>(tflite_option.new_shape());
@@ -367,6 +389,63 @@ class GELUOptionResolver : public TfLiteOptionResolver<::tflite::GeluOptions, GE
     }
 };
 
+class OneHotOptionResolver : public TfLiteOptionResolver<::tflite::OneHotOptions, OneHotOption> {
+    void ParseOptionImpl(OneHotOption& option, const ::tflite::OneHotOptions& tflite_option) const final {
+        option.axis = tflite_option.axis();
+    }
+
+    flatbuffers::Offset<::tflite::OneHotOptions>
+    SerializeOptionImpl(const OneHotOption& option, ::flatbuffers::FlatBufferBuilder* builder) const final {
+        return tflite::CreateOneHotOptions(*builder, option.axis);
+    }
+};
+
+class ShapeOptionResolver : public TfLiteOptionResolver<::tflite::ShapeOptions, ShapeOption> {
+    void ParseOptionImpl(ShapeOption& option, const ::tflite::ShapeOptions& tflite_option) const final {
+        option.out_type = utils::GetMappedDataTypeOf(tflite_option.out_type());
+    }
+
+    flatbuffers::Offset<::tflite::ShapeOptions>
+    SerializeOptionImpl(const ShapeOption& option, ::flatbuffers::FlatBufferBuilder* builder) const final {
+        return tflite::CreateShapeOptions(*builder, utils::GetMappedDataTypeOf(option.out_type));
+    }
+};
+
+class ArgMinOptionResolver : public TfLiteOptionResolver<::tflite::ArgMinOptions, ArgMinOption> {
+    void ParseOptionImpl(ArgMinOption& option, const ::tflite::ArgMinOptions& tflite_option) const final {
+        option.out_type = utils::GetMappedDataTypeOf(tflite_option.output_type());
+    }
+
+    flatbuffers::Offset<::tflite::ArgMinOptions>
+    SerializeOptionImpl(const ArgMinOption& option, ::flatbuffers::FlatBufferBuilder* builder) const final {
+        return tflite::CreateArgMinOptions(*builder, utils::GetMappedDataTypeOf(option.out_type));
+    }
+};
+
+class ArgMaxOptionResolver : public TfLiteOptionResolver<::tflite::ArgMaxOptions, ArgMaxOption> {
+    void ParseOptionImpl(ArgMaxOption& option, const ::tflite::ArgMaxOptions& tflite_option) const final {
+        option.out_type = utils::GetMappedDataTypeOf(tflite_option.output_type());
+    }
+
+    flatbuffers::Offset<::tflite::ArgMaxOptions>
+    SerializeOptionImpl(const ArgMaxOption& option, ::flatbuffers::FlatBufferBuilder* builder) const final {
+        return tflite::CreateArgMaxOptions(*builder, utils::GetMappedDataTypeOf(option.out_type));
+    }
+};
+
+class BatchMatmulOptionResolver : public TfLiteOptionResolver<::tflite::BatchMatMulOptions, BatchMatmulOption> {
+    void ParseOptionImpl(BatchMatmulOption& option, const ::tflite::BatchMatMulOptions& tflite_option) const final {
+        option.adj_x                = tflite_option.adj_x();
+        option.adj_y                = tflite_option.adj_y();
+        option.asym_quantize_inputs = tflite_option.asymmetric_quantize_inputs();
+    }
+
+    flatbuffers::Offset<::tflite::BatchMatMulOptions>
+    SerializeOptionImpl(const BatchMatmulOption& option, ::flatbuffers::FlatBufferBuilder* builder) const final {
+        return tflite::CreateBatchMatMulOptions(*builder, option.adj_x, option.adj_y, option.asym_quantize_inputs);
+    }
+};
+
 /**
  * OperatorResolver provides option parsers for each type of operator.
  * Create each parser in OperatorResolver's constructor, please add new type below.
@@ -380,6 +459,8 @@ OperatorResolver::OperatorResolver() {
     AddOpResolver<TransposeConv2DOptionResolver>(OperatorType::TRANSPOSE_CONV2D,
                                                  ::tflite::BuiltinOperator_TRANSPOSE_CONV,
                                                  ::tflite::BuiltinOptions_TransposeConvOptions);
+    AddOpResolver<Conv3DOptionResolver>(OperatorType::CONV3D, ::tflite::BuiltinOperator_CONV_3D,
+                                        ::tflite::BuiltinOptions_Conv3DOptions);
     AddOpResolver<Pool2DOptionOptionResolver>(OperatorType::MAX_POOL, ::tflite::BuiltinOperator_MAX_POOL_2D,
                                               ::tflite::BuiltinOptions_Pool2DOptions);
     AddOpResolver<Pool2DOptionOptionResolver>(OperatorType::AVERAGE_POOL, ::tflite::BuiltinOperator_AVERAGE_POOL_2D,
@@ -409,6 +490,8 @@ OperatorResolver::OperatorResolver() {
                                                 ::tflite::BuiltinOptions_FullyConnectedOptions);
     AddOpResolver<DummyOptionResolver>(OperatorType::EXP, ::tflite::BuiltinOperator_EXP,
                                        ::tflite::BuiltinOptions_ExpOptions);
+    AddOpResolver<DummyOptionResolver>(OperatorType::MEAN, ::tflite::BuiltinOperator_MEAN,
+                                       ::tflite::BuiltinOptions_NONE);
     AddOpResolver<DummyOptionResolver>(OperatorType::TRANSPOSE, ::tflite::BuiltinOperator_TRANSPOSE,
                                        ::tflite::BuiltinOptions_TransposeOptions);
     AddOpResolver<DummyOptionResolver>(OperatorType::DEQUANTIZE, ::tflite::BuiltinOperator_DEQUANTIZE,
@@ -425,10 +508,29 @@ OperatorResolver::OperatorResolver() {
                                        ::tflite::BuiltinOptions_AbsOptions);
     AddOpResolver<DummyOptionResolver>(OperatorType::HARDSWISH, ::tflite::BuiltinOperator_HARD_SWISH,
                                        ::tflite::BuiltinOptions_HardSwishOptions);
+    AddOpResolver<DummyOptionResolver>(OperatorType::TANH, ::tflite::BuiltinOperator_TANH,
+                                       ::tflite::BuiltinOptions_NONE);
     AddOpResolver<DummyOptionResolver>(OperatorType::SQUARE, ::tflite::BuiltinOperator_SQUARE,
                                        ::tflite::BuiltinOptions_SquareOptions);
     AddOpResolver<DummyOptionResolver>(OperatorType::SQUARED_DIFFERENCE, ::tflite::BuiltinOperator_SQUARED_DIFFERENCE,
                                        ::tflite::BuiltinOptions_SquaredDifferenceOptions);
+    AddOpResolver<DummyOptionResolver>(OperatorType::BATCH_TO_SPACE_ND, ::tflite::BuiltinOperator_BATCH_TO_SPACE_ND,
+                                       ::tflite::BuiltinOptions_BatchToSpaceNDOptions);
+    AddOpResolver<DummyOptionResolver>(OperatorType::SPACE_TO_BATCH_ND, ::tflite::BuiltinOperator_SPACE_TO_BATCH_ND,
+                                       ::tflite::BuiltinOptions_SpaceToBatchNDOptions);
+    AddOpResolver<DummyOptionResolver>(OperatorType::TOPK_V2, ::tflite::BuiltinOperator_TOPK_V2,
+                                       ::tflite::BuiltinOptions_TopKV2Options);
+    AddOpResolver<DummyOptionResolver>(OperatorType::LOG, ::tflite::BuiltinOperator_LOG, ::tflite::BuiltinOptions_NONE);
+    AddOpResolver<DummyOptionResolver>(OperatorType::LOG_SOFTMAX, ::tflite::BuiltinOperator_LOG_SOFTMAX,
+                                       ::tflite::BuiltinOptions_LogSoftmaxOptions);
+    AddOpResolver<DummyOptionResolver>(OperatorType::NEG, ::tflite::BuiltinOperator_NEG,
+                                       ::tflite::BuiltinOptions_NegOptions);
+    AddOpResolver<DummyOptionResolver>(OperatorType::SUM, ::tflite::BuiltinOperator_SUM, ::tflite::BuiltinOptions_NONE);
+    AddOpResolver<DummyOptionResolver>(OperatorType::SIN, ::tflite::BuiltinOperator_SIN, ::tflite::BuiltinOptions_NONE);
+    AddOpResolver<DummyOptionResolver>(OperatorType::COSINE, ::tflite::BuiltinOperator_COS,
+                                       ::tflite::BuiltinOptions_NONE);
+    AddOpResolver<DummyOptionResolver>(OperatorType::PADV2, ::tflite::BuiltinOperator_PADV2,
+                                       ::tflite::BuiltinOptions_PadV2Options);
 
     AddOpResolver<PackOptionResolver>(OperatorType::PACK, ::tflite::BuiltinOperator_PACK,
                                       ::tflite::BuiltinOptions_PackOptions);
@@ -442,11 +544,16 @@ OperatorResolver::OperatorResolver() {
                                        ::tflite::BuiltinOptions_NONE);
     AddOpResolver<SplitOptionResolver>(OperatorType::SPLIT, ::tflite::BuiltinOperator_SPLIT,
                                        ::tflite::BuiltinOptions_SplitOptions);
-    AddOpResolver<SplitOptionResolver>(OperatorType::SPLITV, ::tflite::BuiltinOperator_SPLIT_V,
-                                       ::tflite::BuiltinOptions_SplitVOptions);
+    AddOpResolver<SplitVOptionResolver>(OperatorType::SPLITV, ::tflite::BuiltinOperator_SPLIT_V,
+                                        ::tflite::BuiltinOptions_SplitVOptions);
     AddOpResolver<StridedSliceOptionResolver>(OperatorType::STRIDED_SLICE, ::tflite::BuiltinOperator_STRIDED_SLICE,
                                               ::tflite::BuiltinOptions_StridedSliceOptions);
     AddOpResolver<DummyOptionResolver>(OperatorType::SQRT, ::tflite::BuiltinOperator_SQRT,
+                                       ::tflite::BuiltinOptions_NONE);
+    AddOpResolver<DummyOptionResolver>(OperatorType::ELU, ::tflite::BuiltinOperator_ELU, ::tflite::BuiltinOptions_NONE);
+    AddOpResolver<DummyOptionResolver>(OperatorType::ReLU, ::tflite::BuiltinOperator_RELU,
+                                       ::tflite::BuiltinOptions_NONE);
+    AddOpResolver<DummyOptionResolver>(OperatorType::ReLU6, ::tflite::BuiltinOperator_RELU6,
                                        ::tflite::BuiltinOptions_NONE);
     AddOpResolver<LeakyReLUOptionResolver>(OperatorType::LEAKY_RELU, ::tflite::BuiltinOperator_LEAKY_RELU,
                                            ::tflite::BuiltinOptions_LeakyReluOptions);
@@ -454,10 +561,15 @@ OperatorResolver::OperatorResolver() {
                                            ::tflite::BuiltinOptions_MirrorPadOptions);
     AddOpResolver<GELUOptionResolver>(OperatorType::GELU, ::tflite::BuiltinOperator_GELU,
                                       ::tflite::BuiltinOptions_GeluOptions);
-    AddOpResolver<DummyOptionResolver>(OperatorType::SPACE_TO_DEPTH, ::tflite::BuiltinOperator_SPACE_TO_DEPTH,
-                                       ::tflite::BuiltinOptions_SpaceToDepthOptions);
-    AddOpResolver<DummyOptionResolver>(OperatorType::DEPTH_TO_SPACE, ::tflite::BuiltinOperator_DEPTH_TO_SPACE,
-                                       ::tflite::BuiltinOptions_DepthToSpaceOptions);
+    AddOpResolver<OneHotOptionResolver>(OperatorType::ONE_HOT, ::tflite::BuiltinOperator_ONE_HOT,
+                                        ::tflite::BuiltinOptions_OneHotOptions);
+    AddOpResolver<SpaceToDepthOptionResolver>(OperatorType::SPACE_TO_DEPTH, ::tflite::BuiltinOperator_SPACE_TO_DEPTH,
+                                              ::tflite::BuiltinOptions_SpaceToDepthOptions);
+    AddOpResolver<DepthToSpaceOptionResolver>(OperatorType::DEPTH_TO_SPACE, ::tflite::BuiltinOperator_DEPTH_TO_SPACE,
+                                              ::tflite::BuiltinOptions_DepthToSpaceOptions);
+
+    AddOpResolver<BatchMatmulOptionResolver>(OperatorType::BATCH_MATMUL, ::tflite::BuiltinOperator_BATCH_MATMUL,
+                                             ::tflite::BuiltinOptions_BatchMatMulOptions);
     AddOpResolver<DummyOptionResolver>(OperatorType::PReLU, ::tflite::BuiltinOperator_PRELU,
                                        ::tflite::BuiltinOptions_NONE);
     AddOpResolver<DummyOptionResolver>(OperatorType::PAD, ::tflite::BuiltinOperator_PAD, ::tflite::BuiltinOptions_NONE);
@@ -467,6 +579,14 @@ OperatorResolver::OperatorResolver() {
                                        ::tflite::BuiltinOptions_MaximumMinimumOptions);
     AddOpResolver<DummyOptionResolver>(OperatorType::MINIMUM, ::tflite::BuiltinOperator_MINIMUM,
                                        ::tflite::BuiltinOptions_MaximumMinimumOptions);
+    AddOpResolver<DummyOptionResolver>(OperatorType::ARGMIN, ::tflite::BuiltinOperator_ARG_MIN,
+                                       ::tflite::BuiltinOptions_ArgMinOptions);
+    AddOpResolver<DummyOptionResolver>(OperatorType::ARGMAX, ::tflite::BuiltinOperator_ARG_MAX,
+                                       ::tflite::BuiltinOptions_ArgMaxOptions);
     AddOpResolver<DummyOptionResolver>(OperatorType::BROADCAST_TO, ::tflite::BuiltinOperator_BROADCAST_TO,
                                        ::tflite::BuiltinOptions_BroadcastToOptions);
+    AddOpResolver<DummyOptionResolver>(OperatorType::GATHER_ND, ::tflite::BuiltinOperator_GATHER_ND,
+                                       ::tflite::BuiltinOptions_GatherNdOptions);
+    AddOpResolver<DummyOptionResolver>(OperatorType::SELECT_V2, ::tflite::BuiltinOperator_SELECT_V2,
+                                       ::tflite::BuiltinOptions_SelectV2Options);
 }

@@ -46,6 +46,17 @@ struct TransposeConv2DOption : public BaseOption {
     OperatorType activation_type;
 };
 
+struct Conv3DOption : public BaseOption {
+    int          stride_d;
+    int          stride_w;
+    int          stride_h;
+    int          dilation_d_factor;
+    int          dilation_w_factor;
+    int          dilation_h_factor;
+    Padding      pad_type;
+    OperatorType activation_type;
+};
+
 struct ReshapeOption : public BaseOption {
     std::vector<int32_t> new_shape;
 };
@@ -140,4 +151,26 @@ struct GELUOption : public BaseOption {
 
 struct MirrorPadOption : public BaseOption {
     MirrorPadType mirror_pad_type;
+};
+
+struct OneHotOption : public BaseOption {
+    int axis;
+};
+
+struct ShapeOption : public BaseOption {
+    DataType out_type;
+};
+
+struct ArgMaxOption : public BaseOption {
+    DataType out_type;
+};
+
+struct ArgMinOption : public BaseOption {
+    DataType out_type;
+};
+
+struct BatchMatmulOption : public BaseOption {
+    bool adj_x;
+    bool adj_y;
+    bool asym_quantize_inputs;
 };
