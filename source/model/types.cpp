@@ -15,7 +15,9 @@ std::string ToStr(OperatorType op_type) {
         ENUM_PRINT(OperatorType, ADD);
         ENUM_PRINT(OperatorType, AVERAGE_POOL);
         ENUM_PRINT(OperatorType, BATCH_NORMALIZATION);
+        ENUM_PRINT(OperatorType, BATCH_TO_SPACE_ND);
         ENUM_PRINT(OperatorType, CONV2D);
+        ENUM_PRINT(OperatorType, CONV3D);
         ENUM_PRINT(OperatorType, CONCAT);
         ENUM_PRINT(OperatorType, COSINE);
         ENUM_PRINT(OperatorType, DEPTHWISE_CONV2D);
@@ -31,6 +33,7 @@ std::string ToStr(OperatorType op_type) {
         ENUM_PRINT(OperatorType, UNIDIRECTIONAL_LSTM);
         ENUM_PRINT(OperatorType, LOCAL_RESPONSE_NORMALIZATION);
         ENUM_PRINT(OperatorType, LOG);
+        ENUM_PRINT(OperatorType, LOG_SOFTMAX);
         ENUM_PRINT(OperatorType, LOGISTIC);
         ENUM_PRINT(OperatorType, MAX_POOL);
         ENUM_PRINT(OperatorType, MUL);
@@ -46,6 +49,7 @@ std::string ToStr(OperatorType op_type) {
         ENUM_PRINT(OperatorType, TRANSPOSE_CONV2D);
         ENUM_PRINT(OperatorType, CAST);
         ENUM_PRINT(OperatorType, GATHER);
+        ENUM_PRINT(OperatorType, GATHER_ND);
         ENUM_PRINT(OperatorType, RESIZE_BILINEAR);
         ENUM_PRINT(OperatorType, SIN);
         ENUM_PRINT(OperatorType, PACK);
@@ -58,9 +62,10 @@ std::string ToStr(OperatorType op_type) {
         ENUM_PRINT(OperatorType, ARGMAX);
         ENUM_PRINT(OperatorType, MAXIMUM);
         ENUM_PRINT(OperatorType, MINIMUM);
-        ENUM_PRINT(OperatorType, MATMUL);
+        ENUM_PRINT(OperatorType, BATCH_MATMUL);
         ENUM_PRINT(OperatorType, RESHAPE);
         ENUM_PRINT(OperatorType, RSQRT);
+        ENUM_PRINT(OperatorType, SPACE_TO_BATCH_ND);
         ENUM_PRINT(OperatorType, SPLIT);
         ENUM_PRINT(OperatorType, SPLITV);
         ENUM_PRINT(OperatorType, SQRT);
@@ -69,8 +74,9 @@ std::string ToStr(OperatorType op_type) {
         ENUM_PRINT(OperatorType, SUM);
         ENUM_PRINT(OperatorType, TILE);
         ENUM_PRINT(OperatorType, TRANSPOSE);
+        ENUM_PRINT(OperatorType, TOPK_V2);
         ENUM_PRINT(OperatorType, SELECT);
-        ENUM_PRINT(OperatorType, SELECTV2);
+        ENUM_PRINT(OperatorType, SELECT_V2);
         ENUM_PRINT(OperatorType, EQUAL);
         ENUM_PRINT(OperatorType, NOT_EQUAL);
         ENUM_PRINT(OperatorType, POW);
@@ -86,6 +92,11 @@ std::string ToStr(OperatorType op_type) {
         ENUM_PRINT(OperatorType, REVERSEV2);
         ENUM_PRINT(OperatorType, BIDIRECTIONAL_RNN);
         ENUM_PRINT(OperatorType, ELU);
+        ENUM_PRINT(OperatorType, REDUCE_MIN);
+        ENUM_PRINT(OperatorType, REDUCE_MAX);
+        ENUM_PRINT(OperatorType, REDUCE_PROD);
+        ENUM_PRINT(OperatorType, REDUCE_ANY);
+        ENUM_PRINT(OperatorType, REDUCE_ALL);
         ENUM_PRINT(OperatorType, WHERE);
 
         ENUM_DEFAULT_PRINT(NONE);
