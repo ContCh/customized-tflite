@@ -19,7 +19,7 @@ class DummyOptionResolver : public BaseOptionResolver {
 };
 
 class Conv2DOptionResolver : public TfLiteOptionResolver<::tflite::Conv2DOptions, Conv2DOption> {
-    void ParseOptionImpl(Conv2DOption& option, const ::tflite::Conv2DOptions& tflite_option) const final {
+    void ParseOptionImpl(BaseOptionT& option, const TfLiteOptionT& tflite_option) const final {
         option.stride_h        = tflite_option.stride_w();
         option.stride_w        = tflite_option.stride_w();
         option.dilation_w      = tflite_option.dilation_w_factor();
@@ -28,8 +28,8 @@ class Conv2DOptionResolver : public TfLiteOptionResolver<::tflite::Conv2DOptions
         option.activation_type = utils::GetMappedActTypeOf(tflite_option.fused_activation_function());
     }
 
-    flatbuffers::Offset<::tflite::Conv2DOptions>
-    SerializeOptionImpl(const Conv2DOption& option, ::flatbuffers::FlatBufferBuilder* builder) const final {
+    flatbuffers::Offset<TfLiteOptionT> SerializeOptionImpl(const BaseOptionT&                option,
+                                                           ::flatbuffers::FlatBufferBuilder* builder) const final {
         auto tflite_padding  = utils::GetMappedPaddingOf(option.pad_type);
         auto fuse_activation = utils::GetMappedActTypeOf(option.activation_type);
         return tflite::CreateConv2DOptions(*builder, tflite_padding, option.stride_w, option.stride_h, fuse_activation,
@@ -39,8 +39,7 @@ class Conv2DOptionResolver : public TfLiteOptionResolver<::tflite::Conv2DOptions
 
 class DepthwiseConv2DOptionResolver
     : public TfLiteOptionResolver<::tflite::DepthwiseConv2DOptions, DepthwiseConv2DOption> {
-    void ParseOptionImpl(DepthwiseConv2DOption&                  option,
-                         const ::tflite::DepthwiseConv2DOptions& tflite_option) const final {
+    void ParseOptionImpl(BaseOptionT& option, const TfLiteOptionT& tflite_option) const final {
         option.stride_h         = tflite_option.stride_w();
         option.stride_w         = tflite_option.stride_w();
         option.dilation_w       = tflite_option.dilation_w_factor();
@@ -50,8 +49,8 @@ class DepthwiseConv2DOptionResolver
         option.activation_type  = utils::GetMappedActTypeOf(tflite_option.fused_activation_function());
     }
 
-    flatbuffers::Offset<::tflite::DepthwiseConv2DOptions>
-    SerializeOptionImpl(const DepthwiseConv2DOption& option, ::flatbuffers::FlatBufferBuilder* builder) const final {
+    flatbuffers::Offset<TfLiteOptionT> SerializeOptionImpl(const BaseOptionT&                option,
+                                                           ::flatbuffers::FlatBufferBuilder* builder) const final {
         auto tflite_padding  = utils::GetMappedPaddingOf(option.pad_type);
         auto fuse_activation = utils::GetMappedActTypeOf(option.activation_type);
         return tflite::CreateDepthwiseConv2DOptions(*builder, tflite_padding, option.stride_w, option.stride_h,
@@ -62,16 +61,15 @@ class DepthwiseConv2DOptionResolver
 
 class TransposeConv2DOptionResolver
     : public TfLiteOptionResolver<::tflite::TransposeConvOptions, TransposeConv2DOption> {
-    void ParseOptionImpl(TransposeConv2DOption&                option,
-                         const ::tflite::TransposeConvOptions& tflite_option) const final {
+    void ParseOptionImpl(BaseOptionT& option, const TfLiteOptionT& tflite_option) const final {
         option.stride_h        = tflite_option.stride_w();
         option.stride_w        = tflite_option.stride_w();
         option.pad_type        = utils::GetMappedPaddingOf(tflite_option.padding());
         option.activation_type = utils::GetMappedActTypeOf(tflite_option.fused_activation_function());
     }
 
-    flatbuffers::Offset<::tflite::TransposeConvOptions>
-    SerializeOptionImpl(const TransposeConv2DOption& option, ::flatbuffers::FlatBufferBuilder* builder) const final {
+    flatbuffers::Offset<TfLiteOptionT> SerializeOptionImpl(const BaseOptionT&                option,
+                                                           ::flatbuffers::FlatBufferBuilder* builder) const final {
         auto tflite_padding  = utils::GetMappedPaddingOf(option.pad_type);
         auto fuse_activation = utils::GetMappedActTypeOf(option.activation_type);
         return tflite::CreateTransposeConvOptions(*builder, tflite_padding, option.stride_w, option.stride_h,
@@ -80,7 +78,7 @@ class TransposeConv2DOptionResolver
 };
 
 class Conv3DOptionResolver : public TfLiteOptionResolver<::tflite::Conv3DOptions, Conv3DOption> {
-    void ParseOptionImpl(Conv3DOption& option, const ::tflite::Conv3DOptions& tflite_option) const final {
+    void ParseOptionImpl(BaseOptionT& option, const TfLiteOptionT& tflite_option) const final {
         option.stride_d          = tflite_option.stride_d();
         option.stride_w          = tflite_option.stride_w();
         option.stride_h          = tflite_option.stride_h();
@@ -91,8 +89,8 @@ class Conv3DOptionResolver : public TfLiteOptionResolver<::tflite::Conv3DOptions
         option.activation_type   = utils::GetMappedActTypeOf(tflite_option.fused_activation_function());
     }
 
-    flatbuffers::Offset<::tflite::Conv3DOptions>
-    SerializeOptionImpl(const Conv3DOption& option, ::flatbuffers::FlatBufferBuilder* builder) const final {
+    flatbuffers::Offset<TfLiteOptionT> SerializeOptionImpl(const BaseOptionT&                option,
+                                                           ::flatbuffers::FlatBufferBuilder* builder) const final {
         auto tflite_padding  = utils::GetMappedPaddingOf(option.pad_type);
         auto fuse_activation = utils::GetMappedActTypeOf(option.activation_type);
         return tflite::CreateConv3DOptions(*builder, tflite_padding, option.stride_d, option.stride_w, option.stride_h,
@@ -102,29 +100,29 @@ class Conv3DOptionResolver : public TfLiteOptionResolver<::tflite::Conv3DOptions
 };
 
 class ReshapeOptionResolver : public TfLiteOptionResolver<::tflite::ReshapeOptions, ReshapeOption> {
-    void ParseOptionImpl(ReshapeOption& option, const ::tflite::ReshapeOptions& tflite_option) const final {
+    void ParseOptionImpl(BaseOptionT& option, const TfLiteOptionT& tflite_option) const final {
         option.new_shape = utils::GetVecData<int>(tflite_option.new_shape());
     }
 
-    flatbuffers::Offset<::tflite::ReshapeOptions>
-    SerializeOptionImpl(const ReshapeOption& option, ::flatbuffers::FlatBufferBuilder* builder) const final {
+    flatbuffers::Offset<TfLiteOptionT> SerializeOptionImpl(const BaseOptionT&                option,
+                                                           ::flatbuffers::FlatBufferBuilder* builder) const final {
         return tflite::CreateReshapeOptions(*builder, builder->CreateVector(option.new_shape));
     }
 };
 
 class SoftmaxOptionResolver : public TfLiteOptionResolver<::tflite::SoftmaxOptions, SoftmaxOption> {
-    void ParseOptionImpl(SoftmaxOption& option, const ::tflite::SoftmaxOptions& tflite_option) const final {
+    void ParseOptionImpl(BaseOptionT& option, const TfLiteOptionT& tflite_option) const final {
         option.beta = tflite_option.beta();
     }
 
-    flatbuffers::Offset<::tflite::SoftmaxOptions>
-    SerializeOptionImpl(const SoftmaxOption& option, ::flatbuffers::FlatBufferBuilder* builder) const final {
+    flatbuffers::Offset<TfLiteOptionT> SerializeOptionImpl(const BaseOptionT&                option,
+                                                           ::flatbuffers::FlatBufferBuilder* builder) const final {
         return tflite::CreateSoftmaxOptions(*builder, option.beta);
     }
 };
 
 class Pool2DOptionOptionResolver : public TfLiteOptionResolver<::tflite::Pool2DOptions, Pool2DOption> {
-    void ParseOptionImpl(Pool2DOption& option, const ::tflite::Pool2DOptions& tflite_option) const final {
+    void ParseOptionImpl(BaseOptionT& option, const TfLiteOptionT& tflite_option) const final {
         option.stride_h = tflite_option.stride_h();
         option.stride_w = tflite_option.stride_w();
         option.filter_h = tflite_option.filter_height();
@@ -132,8 +130,8 @@ class Pool2DOptionOptionResolver : public TfLiteOptionResolver<::tflite::Pool2DO
         option.pad_type = utils::GetMappedPaddingOf(tflite_option.padding());
     }
 
-    flatbuffers::Offset<::tflite::Pool2DOptions>
-    SerializeOptionImpl(const Pool2DOption& option, ::flatbuffers::FlatBufferBuilder* builder) const final {
+    flatbuffers::Offset<TfLiteOptionT> SerializeOptionImpl(const BaseOptionT&                option,
+                                                           ::flatbuffers::FlatBufferBuilder* builder) const final {
         auto tflite_padding = utils::GetMappedPaddingOf(option.pad_type);
         return tflite::CreatePool2DOptions(*builder, tflite_padding, option.stride_w, option.stride_h, option.filter_w,
                                            option.filter_h);
@@ -141,102 +139,100 @@ class Pool2DOptionOptionResolver : public TfLiteOptionResolver<::tflite::Pool2DO
 };
 
 class AddOptionResolver : public TfLiteOptionResolver<::tflite::AddOptions, AddOption> {
-    void ParseOptionImpl(AddOption& option, const ::tflite::AddOptions& tflite_option) const final {
+    void ParseOptionImpl(BaseOptionT& option, const TfLiteOptionT& tflite_option) const final {
         option.pot_scale_int16 = tflite_option.pot_scale_int16();
         option.activation_type = utils::GetMappedActTypeOf(tflite_option.fused_activation_function());
     }
 
-    flatbuffers::Offset<::tflite::AddOptions>
-    SerializeOptionImpl(const AddOption& option, ::flatbuffers::FlatBufferBuilder* builder) const final {
+    flatbuffers::Offset<TfLiteOptionT> SerializeOptionImpl(const BaseOptionT&                option,
+                                                           ::flatbuffers::FlatBufferBuilder* builder) const final {
         auto fuse_activation = utils::GetMappedActTypeOf(option.activation_type);
         return tflite::CreateAddOptions(*builder, fuse_activation, option.pot_scale_int16);
     }
 };
 
 class MulOptionResolver : public TfLiteOptionResolver<::tflite::MulOptions, MulOption> {
-    void ParseOptionImpl(MulOption& option, const ::tflite::MulOptions& tflite_option) const final {
+    void ParseOptionImpl(BaseOptionT& option, const TfLiteOptionT& tflite_option) const final {
         option.activation_type = utils::GetMappedActTypeOf(tflite_option.fused_activation_function());
     }
 
-    flatbuffers::Offset<::tflite::MulOptions>
-    SerializeOptionImpl(const MulOption& option, ::flatbuffers::FlatBufferBuilder* builder) const final {
+    flatbuffers::Offset<TfLiteOptionT> SerializeOptionImpl(const BaseOptionT&                option,
+                                                           ::flatbuffers::FlatBufferBuilder* builder) const final {
         return tflite::CreateMulOptions(*builder, utils::GetMappedActTypeOf(option.activation_type));
     }
 };
 
 class SubOptionResolver : public TfLiteOptionResolver<::tflite::SubOptions, SubOption> {
-    void ParseOptionImpl(SubOption& option, const ::tflite::SubOptions& tflite_option) const final {
+    void ParseOptionImpl(BaseOptionT& option, const TfLiteOptionT& tflite_option) const final {
         option.pot_scale_int16 = tflite_option.pot_scale_int16();
         option.activation_type = utils::GetMappedActTypeOf(tflite_option.fused_activation_function());
     }
 
-    flatbuffers::Offset<::tflite::SubOptions>
-    SerializeOptionImpl(const SubOption& option, ::flatbuffers::FlatBufferBuilder* builder) const final {
+    flatbuffers::Offset<TfLiteOptionT> SerializeOptionImpl(const BaseOptionT&                option,
+                                                           ::flatbuffers::FlatBufferBuilder* builder) const final {
         auto fuse_activation = utils::GetMappedActTypeOf(option.activation_type);
         return tflite::CreateSubOptions(*builder, fuse_activation, option.pot_scale_int16);
     }
 };
 
 class DivOptionResolver : public TfLiteOptionResolver<::tflite::DivOptions, DivOption> {
-    void ParseOptionImpl(DivOption& option, const ::tflite::DivOptions& tflite_option) const final {
+    void ParseOptionImpl(BaseOptionT& option, const TfLiteOptionT& tflite_option) const final {
         option.activation_type = utils::GetMappedActTypeOf(tflite_option.fused_activation_function());
     }
 
-    flatbuffers::Offset<::tflite::DivOptions>
-    SerializeOptionImpl(const DivOption& option, ::flatbuffers::FlatBufferBuilder* builder) const final {
+    flatbuffers::Offset<TfLiteOptionT> SerializeOptionImpl(const BaseOptionT&                option,
+                                                           ::flatbuffers::FlatBufferBuilder* builder) const final {
         return tflite::CreateDivOptions(*builder, utils::GetMappedActTypeOf(option.activation_type));
     }
 };
 
 class ConcatOptionResolver : public TfLiteOptionResolver<::tflite::ConcatenationOptions, ConcatOption> {
-    void ParseOptionImpl(ConcatOption& option, const ::tflite::ConcatenationOptions& tflite_option) const final {
+    void ParseOptionImpl(BaseOptionT& option, const TfLiteOptionT& tflite_option) const final {
         option.axis            = tflite_option.axis();
         option.activation_type = utils::GetMappedActTypeOf(tflite_option.fused_activation_function());
     }
 
-    flatbuffers::Offset<::tflite::ConcatenationOptions>
-    SerializeOptionImpl(const ConcatOption& option, ::flatbuffers::FlatBufferBuilder* builder) const final {
+    flatbuffers::Offset<TfLiteOptionT> SerializeOptionImpl(const BaseOptionT&                option,
+                                                           ::flatbuffers::FlatBufferBuilder* builder) const final {
         auto fuse_activation = utils::GetMappedActTypeOf(option.activation_type);
         return tflite::CreateConcatenationOptions(*builder, option.axis, fuse_activation);
     }
 };
 
 class ResizeBilinearOptionResolver : public TfLiteOptionResolver<::tflite::ResizeBilinearOptions, ResizeOption> {
-    void ParseOptionImpl(ResizeOption& option, const ::tflite::ResizeBilinearOptions& tflite_option) const final {
+    void ParseOptionImpl(BaseOptionT& option, const TfLiteOptionT& tflite_option) const final {
         option.align_corners      = tflite_option.align_corners();
         option.half_pixel_centers = tflite_option.half_pixel_centers();
     }
 
-    flatbuffers::Offset<::tflite::ResizeBilinearOptions>
-    SerializeOptionImpl(const ResizeOption& option, ::flatbuffers::FlatBufferBuilder* builder) const final {
+    flatbuffers::Offset<TfLiteOptionT> SerializeOptionImpl(const BaseOptionT&                option,
+                                                           ::flatbuffers::FlatBufferBuilder* builder) const final {
         return tflite::CreateResizeBilinearOptions(*builder, option.align_corners, option.half_pixel_centers);
     }
 };
 
 class ResizeNeighborOptionResolver : public TfLiteOptionResolver<::tflite::ResizeNearestNeighborOptions, ResizeOption> {
-    void ParseOptionImpl(ResizeOption&                                 option,
-                         const ::tflite::ResizeNearestNeighborOptions& tflite_option) const final {
+    void ParseOptionImpl(BaseOptionT& option, const TfLiteOptionT& tflite_option) const final {
         option.align_corners      = tflite_option.align_corners();
         option.half_pixel_centers = tflite_option.half_pixel_centers();
     }
 
-    flatbuffers::Offset<::tflite::ResizeNearestNeighborOptions>
-    SerializeOptionImpl(const ResizeOption& option, ::flatbuffers::FlatBufferBuilder* builder) const final {
+    flatbuffers::Offset<TfLiteOptionT> SerializeOptionImpl(const BaseOptionT&                option,
+                                                           ::flatbuffers::FlatBufferBuilder* builder) const final {
         return tflite::CreateResizeNearestNeighborOptions(*builder, option.align_corners, option.half_pixel_centers);
     }
 };
 
 class FullyConnectedOptionResolver
     : public TfLiteOptionResolver<::tflite::FullyConnectedOptions, FullyConnectedOption> {
-    void ParseOptionImpl(FullyConnectedOption&                  option,
-                         const ::tflite::FullyConnectedOptions& tflite_option) const final {
+    void ParseOptionImpl(BaseOptionT& option, const TfLiteOptionT& tflite_option) const final {
         option.keep_num_dims        = tflite_option.keep_num_dims();
         option.asym_quantize_inputs = tflite_option.asymmetric_quantize_inputs();
         option.activation_type      = utils::GetMappedActTypeOf(tflite_option.fused_activation_function());
     }
 
-    flatbuffers::Offset<::tflite::FullyConnectedOptions>
-    SerializeOptionImpl(const FullyConnectedOption& option, ::flatbuffers::FlatBufferBuilder* builder) const final {
+    flatbuffers::Offset<TfLiteOptionT> SerializeOptionImpl(const BaseOptionT&                option,
+                                                           ::flatbuffers::FlatBufferBuilder* builder) const final {
         auto fuse_activation = utils::GetMappedActTypeOf(option.activation_type);
         return tflite::CreateFullyConnectedOptions(*builder, fuse_activation,
                                                    tflite::FullyConnectedOptionsWeightsFormat_DEFAULT,
@@ -245,37 +241,37 @@ class FullyConnectedOptionResolver
 };
 
 class PackOptionResolver : public TfLiteOptionResolver<::tflite::PackOptions, PackOption> {
-    void ParseOptionImpl(PackOption& option, const ::tflite::PackOptions& tflite_option) const final {
+    void ParseOptionImpl(BaseOptionT& option, const TfLiteOptionT& tflite_option) const final {
         option.axis         = tflite_option.axis();
         option.values_count = tflite_option.values_count();
     }
 
-    flatbuffers::Offset<::tflite::PackOptions>
-    SerializeOptionImpl(const PackOption& option, ::flatbuffers::FlatBufferBuilder* builder) const final {
+    flatbuffers::Offset<TfLiteOptionT> SerializeOptionImpl(const BaseOptionT&                option,
+                                                           ::flatbuffers::FlatBufferBuilder* builder) const final {
         return tflite::CreatePackOptions(*builder, option.values_count, option.axis);
     }
 };
 
 class UnpackOptionResolver : public TfLiteOptionResolver<::tflite::UnpackOptions, UnPackOption> {
-    void ParseOptionImpl(UnPackOption& option, const ::tflite::UnpackOptions& tflite_option) const final {
+    void ParseOptionImpl(BaseOptionT& option, const TfLiteOptionT& tflite_option) const final {
         option.axis   = tflite_option.axis();
         option.number = tflite_option.num();
     }
 
-    flatbuffers::Offset<::tflite::UnpackOptions>
-    SerializeOptionImpl(const UnPackOption& option, ::flatbuffers::FlatBufferBuilder* builder) const final {
+    flatbuffers::Offset<TfLiteOptionT> SerializeOptionImpl(const BaseOptionT&                option,
+                                                           ::flatbuffers::FlatBufferBuilder* builder) const final {
         return tflite::CreateUnpackOptions(*builder, option.number, option.axis);
     }
 };
 
 class CastOptionResolver : public TfLiteOptionResolver<::tflite::CastOptions, CastOption> {
-    void ParseOptionImpl(CastOption& option, const ::tflite::CastOptions& tflite_option) const final {
+    void ParseOptionImpl(BaseOptionT& option, const TfLiteOptionT& tflite_option) const final {
         option.in_data_type  = utils::GetMappedDataTypeOf(tflite_option.in_data_type());
         option.out_data_type = utils::GetMappedDataTypeOf(tflite_option.out_data_type());
     }
 
-    flatbuffers::Offset<::tflite::CastOptions>
-    SerializeOptionImpl(const CastOption& option, ::flatbuffers::FlatBufferBuilder* builder) const final {
+    flatbuffers::Offset<TfLiteOptionT> SerializeOptionImpl(const BaseOptionT&                option,
+                                                           ::flatbuffers::FlatBufferBuilder* builder) const final {
         auto in_data_type  = utils::GetMappedDataTypeOf(option.in_data_type);
         auto out_data_type = utils::GetMappedDataTypeOf(option.out_data_type);
         return tflite::CreateCastOptions(*builder, in_data_type, out_data_type);
@@ -283,41 +279,41 @@ class CastOptionResolver : public TfLiteOptionResolver<::tflite::CastOptions, Ca
 };
 
 class GatherOptionResolver : public TfLiteOptionResolver<::tflite::GatherOptions, GatherOption> {
-    void ParseOptionImpl(GatherOption& option, const ::tflite::GatherOptions& tflite_option) const final {
+    void ParseOptionImpl(BaseOptionT& option, const TfLiteOptionT& tflite_option) const final {
         option.axis       = tflite_option.axis();
         option.batch_dims = tflite_option.batch_dims();
     }
 
-    flatbuffers::Offset<::tflite::GatherOptions>
-    SerializeOptionImpl(const GatherOption& option, ::flatbuffers::FlatBufferBuilder* builder) const final {
+    flatbuffers::Offset<TfLiteOptionT> SerializeOptionImpl(const BaseOptionT&                option,
+                                                           ::flatbuffers::FlatBufferBuilder* builder) const final {
         return tflite::CreateGatherOptions(*builder, option.axis, option.batch_dims);
     }
 };
 
 class DepthToSpaceOptionResolver : public TfLiteOptionResolver<::tflite::DepthToSpaceOptions, DepthToSpaceOption> {
-    void ParseOptionImpl(DepthToSpaceOption& option, const ::tflite::DepthToSpaceOptions& tflite_option) const final {
+    void ParseOptionImpl(BaseOptionT& option, const TfLiteOptionT& tflite_option) const final {
         option.block_size = tflite_option.block_size();
     }
 
-    flatbuffers::Offset<::tflite::DepthToSpaceOptions>
-    SerializeOptionImpl(const DepthToSpaceOption& option, ::flatbuffers::FlatBufferBuilder* builder) const final {
+    flatbuffers::Offset<TfLiteOptionT> SerializeOptionImpl(const BaseOptionT&                option,
+                                                           ::flatbuffers::FlatBufferBuilder* builder) const final {
         return tflite::CreateDepthToSpaceOptions(*builder, option.block_size);
     }
 };
 
 class SpaceToDepthOptionResolver : public TfLiteOptionResolver<::tflite::SpaceToDepthOptions, SpaceToDepthOption> {
-    void ParseOptionImpl(SpaceToDepthOption& option, const ::tflite::SpaceToDepthOptions& tflite_option) const final {
+    void ParseOptionImpl(BaseOptionT& option, const TfLiteOptionT& tflite_option) const final {
         option.block_size = tflite_option.block_size();
     }
 
-    flatbuffers::Offset<::tflite::SpaceToDepthOptions>
-    SerializeOptionImpl(const SpaceToDepthOption& option, ::flatbuffers::FlatBufferBuilder* builder) const final {
+    flatbuffers::Offset<TfLiteOptionT> SerializeOptionImpl(const BaseOptionT&                option,
+                                                           ::flatbuffers::FlatBufferBuilder* builder) const final {
         return tflite::CreateSpaceToDepthOptions(*builder, option.block_size);
     }
 };
 
 class StridedSliceOptionResolver : public TfLiteOptionResolver<::tflite::StridedSliceOptions, StridedSliceOption> {
-    void ParseOptionImpl(StridedSliceOption& option, const ::tflite::StridedSliceOptions& tflite_option) const final {
+    void ParseOptionImpl(BaseOptionT& option, const TfLiteOptionT& tflite_option) const final {
         option.begin_mask       = tflite_option.begin_mask();
         option.end_mask         = tflite_option.end_mask();
         option.ellipsis_mask    = tflite_option.ellipsis_mask();
@@ -326,122 +322,122 @@ class StridedSliceOptionResolver : public TfLiteOptionResolver<::tflite::Strided
         option.offset           = tflite_option.offset();
     }
 
-    flatbuffers::Offset<::tflite::StridedSliceOptions>
-    SerializeOptionImpl(const StridedSliceOption& option, ::flatbuffers::FlatBufferBuilder* builder) const final {
+    flatbuffers::Offset<TfLiteOptionT> SerializeOptionImpl(const BaseOptionT&                option,
+                                                           ::flatbuffers::FlatBufferBuilder* builder) const final {
         return tflite::CreateStridedSliceOptions(*builder, option.begin_mask, option.end_mask, option.ellipsis_mask,
                                                  option.new_axis_mask, option.shrink_axis_mask, option.offset);
     }
 };
 
 class SplitOptionResolver : public TfLiteOptionResolver<::tflite::SplitOptions, SplitOption> {
-    void ParseOptionImpl(SplitOption& option, const ::tflite::SplitOptions& tflite_option) const final {
+    void ParseOptionImpl(BaseOptionT& option, const TfLiteOptionT& tflite_option) const final {
         option.num_splits = tflite_option.num_splits();
     }
 
-    flatbuffers::Offset<::tflite::SplitOptions>
-    SerializeOptionImpl(const SplitOption& option, ::flatbuffers::FlatBufferBuilder* builder) const final {
+    flatbuffers::Offset<TfLiteOptionT> SerializeOptionImpl(const BaseOptionT&                option,
+                                                           ::flatbuffers::FlatBufferBuilder* builder) const final {
         return tflite::CreateSplitOptions(*builder, option.num_splits);
     }
 };
 
 class SplitVOptionResolver : public TfLiteOptionResolver<::tflite::SplitVOptions, SplitOption> {
-    void ParseOptionImpl(SplitOption& option, const ::tflite::SplitVOptions& tflite_option) const final {
+    void ParseOptionImpl(BaseOptionT& option, const TfLiteOptionT& tflite_option) const final {
         option.num_splits = tflite_option.num_splits();
     }
 
-    flatbuffers::Offset<::tflite::SplitVOptions>
-    SerializeOptionImpl(const SplitOption& option, ::flatbuffers::FlatBufferBuilder* builder) const final {
+    flatbuffers::Offset<TfLiteOptionT> SerializeOptionImpl(const BaseOptionT&                option,
+                                                           ::flatbuffers::FlatBufferBuilder* builder) const final {
         return tflite::CreateSplitVOptions(*builder, option.num_splits);
     }
 };
 
 class LeakyReLUOptionResolver : public TfLiteOptionResolver<::tflite::LeakyReluOptions, LeakyReLUOption> {
-    void ParseOptionImpl(LeakyReLUOption& option, const ::tflite::LeakyReluOptions& tflite_option) const final {
+    void ParseOptionImpl(BaseOptionT& option, const TfLiteOptionT& tflite_option) const final {
         option.alpha = tflite_option.alpha();
     }
 
-    flatbuffers::Offset<::tflite::LeakyReluOptions>
-    SerializeOptionImpl(const LeakyReLUOption& option, ::flatbuffers::FlatBufferBuilder* builder) const final {
+    flatbuffers::Offset<TfLiteOptionT> SerializeOptionImpl(const BaseOptionT&                option,
+                                                           ::flatbuffers::FlatBufferBuilder* builder) const final {
         return tflite::CreateLeakyReluOptions(*builder, option.alpha);
     }
 };
 
 class MirrorPadOptionResolver : public TfLiteOptionResolver<::tflite::MirrorPadOptions, MirrorPadOption> {
-    void ParseOptionImpl(MirrorPadOption& option, const ::tflite::MirrorPadOptions& tflite_option) const final {
+    void ParseOptionImpl(BaseOptionT& option, const TfLiteOptionT& tflite_option) const final {
         option.mirror_pad_type = static_cast<MirrorPadType>(tflite_option.mode());
     }
 
-    flatbuffers::Offset<::tflite::MirrorPadOptions>
-    SerializeOptionImpl(const MirrorPadOption& option, ::flatbuffers::FlatBufferBuilder* builder) const final {
+    flatbuffers::Offset<TfLiteOptionT> SerializeOptionImpl(const BaseOptionT&                option,
+                                                           ::flatbuffers::FlatBufferBuilder* builder) const final {
         auto mirror_pad_type = static_cast<tflite::MirrorPadMode>(option.mirror_pad_type);
         return tflite::CreateMirrorPadOptions(*builder, mirror_pad_type);
     }
 };
 
 class GELUOptionResolver : public TfLiteOptionResolver<::tflite::GeluOptions, GELUOption> {
-    void ParseOptionImpl(GELUOption& option, const ::tflite::GeluOptions& tflite_option) const final {
+    void ParseOptionImpl(BaseOptionT& option, const TfLiteOptionT& tflite_option) const final {
         option.approximate = tflite_option.approximate();
     }
 
-    flatbuffers::Offset<::tflite::GeluOptions>
-    SerializeOptionImpl(const GELUOption& option, ::flatbuffers::FlatBufferBuilder* builder) const final {
+    flatbuffers::Offset<TfLiteOptionT> SerializeOptionImpl(const BaseOptionT&                option,
+                                                           ::flatbuffers::FlatBufferBuilder* builder) const final {
         return tflite::CreateGeluOptions(*builder, option.approximate);
     }
 };
 
 class OneHotOptionResolver : public TfLiteOptionResolver<::tflite::OneHotOptions, OneHotOption> {
-    void ParseOptionImpl(OneHotOption& option, const ::tflite::OneHotOptions& tflite_option) const final {
+    void ParseOptionImpl(BaseOptionT& option, const TfLiteOptionT& tflite_option) const final {
         option.axis = tflite_option.axis();
     }
 
-    flatbuffers::Offset<::tflite::OneHotOptions>
-    SerializeOptionImpl(const OneHotOption& option, ::flatbuffers::FlatBufferBuilder* builder) const final {
+    flatbuffers::Offset<TfLiteOptionT> SerializeOptionImpl(const BaseOptionT&                option,
+                                                           ::flatbuffers::FlatBufferBuilder* builder) const final {
         return tflite::CreateOneHotOptions(*builder, option.axis);
     }
 };
 
 class ShapeOptionResolver : public TfLiteOptionResolver<::tflite::ShapeOptions, ShapeOption> {
-    void ParseOptionImpl(ShapeOption& option, const ::tflite::ShapeOptions& tflite_option) const final {
+    void ParseOptionImpl(BaseOptionT& option, const TfLiteOptionT& tflite_option) const final {
         option.out_type = utils::GetMappedDataTypeOf(tflite_option.out_type());
     }
 
-    flatbuffers::Offset<::tflite::ShapeOptions>
-    SerializeOptionImpl(const ShapeOption& option, ::flatbuffers::FlatBufferBuilder* builder) const final {
+    flatbuffers::Offset<TfLiteOptionT> SerializeOptionImpl(const BaseOptionT&                option,
+                                                           ::flatbuffers::FlatBufferBuilder* builder) const final {
         return tflite::CreateShapeOptions(*builder, utils::GetMappedDataTypeOf(option.out_type));
     }
 };
 
 class ArgMinOptionResolver : public TfLiteOptionResolver<::tflite::ArgMinOptions, ArgMinOption> {
-    void ParseOptionImpl(ArgMinOption& option, const ::tflite::ArgMinOptions& tflite_option) const final {
+    void ParseOptionImpl(BaseOptionT& option, const TfLiteOptionT& tflite_option) const final {
         option.out_type = utils::GetMappedDataTypeOf(tflite_option.output_type());
     }
 
-    flatbuffers::Offset<::tflite::ArgMinOptions>
-    SerializeOptionImpl(const ArgMinOption& option, ::flatbuffers::FlatBufferBuilder* builder) const final {
+    flatbuffers::Offset<TfLiteOptionT> SerializeOptionImpl(const BaseOptionT&                option,
+                                                           ::flatbuffers::FlatBufferBuilder* builder) const final {
         return tflite::CreateArgMinOptions(*builder, utils::GetMappedDataTypeOf(option.out_type));
     }
 };
 
 class ArgMaxOptionResolver : public TfLiteOptionResolver<::tflite::ArgMaxOptions, ArgMaxOption> {
-    void ParseOptionImpl(ArgMaxOption& option, const ::tflite::ArgMaxOptions& tflite_option) const final {
+    void ParseOptionImpl(BaseOptionT& option, const TfLiteOptionT& tflite_option) const final {
         option.out_type = utils::GetMappedDataTypeOf(tflite_option.output_type());
     }
 
-    flatbuffers::Offset<::tflite::ArgMaxOptions>
-    SerializeOptionImpl(const ArgMaxOption& option, ::flatbuffers::FlatBufferBuilder* builder) const final {
+    flatbuffers::Offset<TfLiteOptionT> SerializeOptionImpl(const BaseOptionT&                option,
+                                                           ::flatbuffers::FlatBufferBuilder* builder) const final {
         return tflite::CreateArgMaxOptions(*builder, utils::GetMappedDataTypeOf(option.out_type));
     }
 };
 
 class BatchMatmulOptionResolver : public TfLiteOptionResolver<::tflite::BatchMatMulOptions, BatchMatmulOption> {
-    void ParseOptionImpl(BatchMatmulOption& option, const ::tflite::BatchMatMulOptions& tflite_option) const final {
+    void ParseOptionImpl(BaseOptionT& option, const TfLiteOptionT& tflite_option) const final {
         option.adj_x                = tflite_option.adj_x();
         option.adj_y                = tflite_option.adj_y();
         option.asym_quantize_inputs = tflite_option.asymmetric_quantize_inputs();
     }
 
-    flatbuffers::Offset<::tflite::BatchMatMulOptions>
-    SerializeOptionImpl(const BatchMatmulOption& option, ::flatbuffers::FlatBufferBuilder* builder) const final {
+    flatbuffers::Offset<TfLiteOptionT> SerializeOptionImpl(const BaseOptionT&                option,
+                                                           ::flatbuffers::FlatBufferBuilder* builder) const final {
         return tflite::CreateBatchMatMulOptions(*builder, option.adj_x, option.adj_y, option.asym_quantize_inputs);
     }
 };
