@@ -25,16 +25,18 @@ function build_main() {
          mkdir ${BUILD_DIRNAME}
     fi
     CMAKE_COMMAND="cmake -DCMAKE_BUILD_TYPE=${COMPILE_MODE} "
-    MAKE_COMMAND="make -j 32"
+    BUILD_COMMAND="cmake --build . -j 32"
     if [ ${WITH_TEST} = "true" ]; then
         CMAKE_COMMAND="${CMAKE_COMMAND} -DENABLE_UNIT_TEST=ON "
     fi
     echo "${CMAKE_COMMAND}"
     cd ${BUILD_DIRNAME}
     ${CMAKE_COMMAND} ..
-    ${MAKE_COMMAND}
+    ${BUILD_COMMAND}
 }
 
+WORK_DIRECTORY=$( realpath "$( dirname ${BASH_SOURCE[0]} )"/.. )
+cd ${WORK_DIRECTORY}
 # Main
 Arg_number=$#
 Args=($@)

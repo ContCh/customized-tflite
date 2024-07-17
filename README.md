@@ -5,10 +5,18 @@ Customized-tflite is a customized, personal, flexible repository based on tflite
 
 ## Build
 ```bash
-mkdir build
-cmake ..
-make -j 20
+./scripts/build.sh -c
 ```
+About the usage of `build.sh`, please type `./scripts/build.sh --help` to learn more.
+
+## Tools
+The repository provide user with useful tools, here is the list:
++ graph_cutter
+  - Cut/Crop a piece of graph from the given TfLite model.
++ TBD
+
+You can find the usage details for each tool in `${PROJECT_DIR}/tools`, please check [README.md](tools/README.md).<br/>
+You can also find the source codes in the directory, welcome if you want to add any tool, or make any changes.
 
 ## License
 
