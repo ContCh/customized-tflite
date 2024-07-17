@@ -24,4 +24,5 @@ include_directories(include)
 include_directories(schema)
 
 add_subdirectory(source)
+add_subdirectory(tools)
 add_subdirectory(tests)

@@ -1,4 +1,4 @@
-#include "tools/graph_cutter/cutting_utils.h"
+#include "graph_cutter/cutting_utils.h"
 
 #include <queue>
 

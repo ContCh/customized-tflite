@@ -1,9 +1,9 @@
 #include "common/command_line_parser.h"
 #include "common/string_utils.h"
+#include "graph_cutter/cutting_utils.h"
 #include "model/model.h"
 #include "parser_and_serializer/tflite/parser.h"
 #include "parser_and_serializer/tflite/serializer.h"
-#include "tools/graph_cutter/cutting_utils.h"
 
 struct CutterOptions {
     Option<std::string> input_tflite_file;
