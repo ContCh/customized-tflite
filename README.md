@@ -5,9 +5,10 @@ Customized-tflite is a customized, personal, flexible repository based on tflite
 
 ## Build
 ```bash
-mkdir build
-cmake ..
-make -j 20
+# linux
+./scripts/build.sh -c
+# windows
+./scripts/build-win.cmd
 ```
 
 ## License

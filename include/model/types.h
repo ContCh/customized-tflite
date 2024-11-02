@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <vector>
+#include <stdint.h>
 
 typedef uint32_t NODEID_T;
 typedef uint32_t BLOBID_T;

@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <unordered_set>
+#include <stdint.h>
 
 namespace common {
 std::string join(const std::vector<std::string>& strs, char connector) { return join(strs, std::string(1, connector)); }
